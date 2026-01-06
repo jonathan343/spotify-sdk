@@ -1,3 +1,2 @@
-import importlib.metadata
-
-__version__: str = importlib.metadata.version("spotify_sdk")
+def hello() -> str:
+    return "Hello from spotify-sdk!"

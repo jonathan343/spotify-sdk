@@ -1,8 +1,15 @@
 [project]
-name = "spotify_sdk"
-version = "0.1.0"
+name = "spotify-sdk"
+version = "0.0.0a1"
 description = "Add your description here"
 license = "Apache-2.0"
 readme = "README.md"
-requires-python = ">=3.13"
+authors = [
+    { name = "jonathan343", email = "jonathangee09@gmail.com" }
+]
+requires-python = ">=3.14"
 dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.9.21,<0.10.0"]
+build-backend = "uv_build"
