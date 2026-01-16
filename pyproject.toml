@@ -42,7 +42,16 @@ default-groups = ["lint"]
 line-length = 79
 
 [tool.ruff.lint]
-select = ["ASYNC", "LOG"]
+select = [
+  # flake8-async: Checks for problems related to asyncio
+  "ASYNC",
+  # flake8-logging: Checks for issues when using the logging module
+  "LOG",
+  # isort: Checks for un-sorted, un-formatted, and missing imports
+  "I",
+  # Checks for unused imports
+  "F401"
+]
 
 [tool.ruff.format]
 docstring-code-format = true
