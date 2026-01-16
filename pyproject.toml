@@ -27,3 +27,17 @@ dependencies = []
 [build-system]
 requires = ["uv_build>=0.9.21,<0.10.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.13",
+]
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+select = ["ASYNC", "LOG"]
+
+[tool.ruff.format]
+docstring-code-format = true
