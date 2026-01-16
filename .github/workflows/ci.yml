@@ -1,0 +1,26 @@
+name: CI
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b # v7
+        with:
+          python-version-file: .python-version
+      - name: Install dependencies
+        run: uv sync --group lint
+      # Update output format to enable automatic inline annotations.
+      - name: Run Ruff
+        run: uv run ruff check --output-format=github .
