@@ -1,0 +1,36 @@
+{
+  "external_urls": {
+    "spotify": "https://open.spotify.com/artist/2YZyLoL8N0Wb9xBt1NhZWg"
+  },
+  "followers": {
+    "href": null,
+    "total": 45978576
+  },
+  "genres": [
+    "hip hop",
+    "west coast hip hop"
+  ],
+  "href": "https://api.spotify.com/v1/artists/2YZyLoL8N0Wb9xBt1NhZWg",
+  "id": "2YZyLoL8N0Wb9xBt1NhZWg",
+  "images": [
+    {
+      "url": "https://i.scdn.co/image/ab6761610000e5eb39ba6dcd4355c03de0b50918",
+      "height": 640,
+      "width": 640
+    },
+    {
+      "url": "https://i.scdn.co/image/ab6761610000517439ba6dcd4355c03de0b50918",
+      "height": 320,
+      "width": 320
+    },
+    {
+      "url": "https://i.scdn.co/image/ab6761610000f17839ba6dcd4355c03de0b50918",
+      "height": 160,
+      "width": 160
+    }
+  ],
+  "name": "Kendrick Lamar",
+  "popularity": 91,
+  "type": "artist",
+  "uri": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg"
+}
