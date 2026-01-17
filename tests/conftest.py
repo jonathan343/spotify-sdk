@@ -15,10 +15,15 @@ def load_fixture():
         try:
             raw_text = fixture_path.read_text()
         except OSError as e:
-            raise FileNotFoundError(f"Failed to read fixture file '{fixture_path}': {e}") from e
+            raise FileNotFoundError(
+                f"Failed to read fixture file '{fixture_path}': {e}"
+            ) from e
 
         try:
             return json.loads(raw_text)
         except json.JSONDecodeError as e:
-            raise ValueError(f"Failed to parse JSON in fixture file '{fixture_path}': {e}") from e
+            raise ValueError(
+                f"Failed to parse JSON in fixture file '{fixture_path}': {e}"
+            ) from e
+
     return _load
