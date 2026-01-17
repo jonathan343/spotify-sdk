@@ -34,9 +34,12 @@ build-backend = "uv_build"
 lint = [
     "ruff>=0.14.13",
 ]
+test = [
+    "pytest>=9.0.2",
+]
 
 [tool.uv]
-default-groups = ["lint"]
+default-groups = ["lint", "test"]
 
 [tool.ruff]
 line-length = 79
