@@ -85,6 +85,17 @@ TRACK_RESPONSE = {
 
 
 class TestAlbumServiceGet:
+    def test_get_empty_id_raises_error(self):
+        client = SpotifyClient(access_token="test-token")
+        with pytest.raises(ValueError, match="album_id cannot be empty"):
+            client.albums.get("")
+
+    @pytest.mark.anyio
+    async def test_get_async_empty_id_raises_error(self):
+        async with SpotifyClient(access_token="test-token") as client:
+            with pytest.raises(ValueError, match="album_id cannot be empty"):
+                await client.albums.get_async("")
+
     def test_get_album(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             url="https://api.spotify.com/v1/albums/123",
@@ -125,6 +136,17 @@ class TestAlbumServiceGet:
 
 
 class TestAlbumServiceGetSeveral:
+    def test_get_several_empty_list_raises_error(self):
+        client = SpotifyClient(access_token="test-token")
+        with pytest.raises(ValueError, match="album_ids cannot be empty"):
+            client.albums.get_several([])
+
+    @pytest.mark.anyio
+    async def test_get_several_async_empty_list_raises_error(self):
+        async with SpotifyClient(access_token="test-token") as client:
+            with pytest.raises(ValueError, match="album_ids cannot be empty"):
+                await client.albums.get_several_async([])
+
     def test_get_several_albums(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             url="https://api.spotify.com/v1/albums?ids=123%2C456",
@@ -164,6 +186,17 @@ class TestAlbumServiceGetSeveral:
 
 
 class TestAlbumServiceGetTracks:
+    def test_get_tracks_empty_id_raises_error(self):
+        client = SpotifyClient(access_token="test-token")
+        with pytest.raises(ValueError, match="album_id cannot be empty"):
+            client.albums.get_tracks("")
+
+    @pytest.mark.anyio
+    async def test_get_tracks_async_empty_id_raises_error(self):
+        async with SpotifyClient(access_token="test-token") as client:
+            with pytest.raises(ValueError, match="album_id cannot be empty"):
+                await client.albums.get_tracks_async("")
+
     def test_get_tracks(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             url="https://api.spotify.com/v1/albums/123/tracks?limit=20&offset=0",

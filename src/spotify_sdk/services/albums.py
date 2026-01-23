@@ -18,7 +18,12 @@ class AlbumService(BaseService):
 
         Returns:
             The requested album.
+
+        Raises:
+            ValueError: If album_id is empty.
         """
+        if not album_id:
+            raise ValueError("album_id cannot be empty")
         params = {"market": market} if market else None
         data = self._get(f"/albums/{album_id}", params=params)
         return Album.model_validate(data)
@@ -34,7 +39,12 @@ class AlbumService(BaseService):
 
         Returns:
             The requested album.
+
+        Raises:
+            ValueError: If album_id is empty.
         """
+        if not album_id:
+            raise ValueError("album_id cannot be empty")
         params = {"market": market} if market else None
         data = await self._get_async(f"/albums/{album_id}", params=params)
         return Album.model_validate(data)
@@ -47,12 +57,18 @@ class AlbumService(BaseService):
         """Get multiple albums by IDs.
 
         Args:
-            album_ids: List of Spotify album IDs (max 20).
+            album_ids: List of Spotify album IDs. The Spotify API enforces a
+                maximum of 20 IDs per request.
             market: An ISO 3166-1 alpha-2 country code for track relinking.
 
         Returns:
             List of albums.
+
+        Raises:
+            ValueError: If album_ids is empty.
         """
+        if not album_ids:
+            raise ValueError("album_ids cannot be empty")
         params: dict[str, str] = {"ids": ",".join(album_ids)}
         if market:
             params["market"] = market
@@ -67,12 +83,18 @@ class AlbumService(BaseService):
         """Get multiple albums by IDs asynchronously.
 
         Args:
-            album_ids: List of Spotify album IDs (max 20).
+            album_ids: List of Spotify album IDs. The Spotify API enforces a
+                maximum of 20 IDs per request.
             market: An ISO 3166-1 alpha-2 country code for track relinking.
 
         Returns:
             List of albums.
+
+        Raises:
+            ValueError: If album_ids is empty.
         """
+        if not album_ids:
+            raise ValueError("album_ids cannot be empty")
         params: dict[str, str] = {"ids": ",".join(album_ids)}
         if market:
             params["market"] = market
@@ -96,7 +118,12 @@ class AlbumService(BaseService):
 
         Returns:
             Paginated list of tracks.
+
+        Raises:
+            ValueError: If album_id is empty.
         """
+        if not album_id:
+            raise ValueError("album_id cannot be empty")
         params = {"market": market, "limit": limit, "offset": offset}
         data = self._get(f"/albums/{album_id}/tracks", params=params)
         return Page[SimplifiedTrack].model_validate(data)
@@ -118,7 +145,12 @@ class AlbumService(BaseService):
 
         Returns:
             Paginated list of tracks.
+
+        Raises:
+            ValueError: If album_id is empty.
         """
+        if not album_id:
+            raise ValueError("album_id cannot be empty")
         params = {"market": market, "limit": limit, "offset": offset}
         data = await self._get_async(
             f"/albums/{album_id}/tracks", params=params
