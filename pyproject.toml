@@ -23,6 +23,7 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
+    "httpx>=0.28.1",
     "pydantic>=2.12.5",
 ]
 
@@ -36,6 +37,7 @@ lint = [
 ]
 test = [
     "pytest>=9.0.2",
+    "pytest-httpx>=0.36.0",
 ]
 
 [tool.uv]
