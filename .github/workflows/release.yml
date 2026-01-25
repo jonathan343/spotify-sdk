@@ -10,7 +10,7 @@ jobs:
   pypi:
     name: Publish to pypi
     runs-on: ubuntu-latest
-    # Environment and permissions trusted publishing.
+    # Environment and permissions for trusted publishing.
     environment:
       name: pypi
     permissions:
