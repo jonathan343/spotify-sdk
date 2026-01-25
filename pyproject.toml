@@ -1,6 +1,6 @@
 [project]
 name = "spotify-sdk"
-version = "0.0.0a1"
+version = "0.1.0"
 description = "Add your description here"
 license = "Apache-2.0"
 readme = "README.md"
