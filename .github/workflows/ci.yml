@@ -27,6 +27,21 @@ jobs:
       - name: Check formatting
         run: uv run ruff format --check --output-format=github --preview .
 
+  type-check:
+    runs-on: ubuntu-latest
+    name: Type Check
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b # v7
+        with:
+          python-version-file: .python-version
+      - name: Install dependencies
+        run: uv sync --group typecheck
+      - name: Run type checking
+        run: uv run pyright
+
   test:
     runs-on: ubuntu-latest
     name: Test
