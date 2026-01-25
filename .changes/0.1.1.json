@@ -1,0 +1,15 @@
+{
+  "schema-version": "0.2",
+  "changes": [
+    {
+      "type": "enhancement",
+      "category": "albums",
+      "description": "Add `get_new_releases` and `get_new_releases_async` methods to `AlbumService` for retrieving new album releases from Spotify's Browse API ([#13](https://github.com/jonathan343/spotify-sdk/pull/13))."
+    },
+    {
+      "type": "enhancement",
+      "category": "tracks",
+      "description": "Add `TrackService` with `get`, `get_several`, and async variants for retrieving tracks from the Spotify API ([#14](https://github.com/jonathan343/spotify-sdk/pull/14))."
+    }
+  ]
+}

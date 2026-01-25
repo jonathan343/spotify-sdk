@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.1
+
+### Enhancements
+* Add `get_new_releases` and `get_new_releases_async` methods to `AlbumService` for retrieving new album releases from Spotify's Browse API ([#13](https://github.com/jonathan343/spotify-sdk/pull/13)).
+* Add `TrackService` with `get`, `get_several`, and async variants for retrieving tracks from the Spotify API ([#14](https://github.com/jonathan343/spotify-sdk/pull/14)).
+
 ## v0.1.0
 
 ### Features
