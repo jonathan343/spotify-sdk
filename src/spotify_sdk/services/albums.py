@@ -170,7 +170,7 @@ class AlbumService(BaseService):
             Paginated list of new album releases.
         """
         params = {"limit": limit, "offset": offset}
-        data = self._get(path="/browse/new-releases", params=params)
+        data = self._get("/browse/new-releases", params=params)
         return Page[SimplifiedAlbum].model_validate(data["albums"])
 
     async def get_new_releases_async(
@@ -186,7 +186,5 @@ class AlbumService(BaseService):
             Paginated list of new album releases.
         """
         params = {"limit": limit, "offset": offset}
-        data = await self._get_async(
-            path="/browse/new-releases", params=params
-        )
+        data = await self._get_async("/browse/new-releases", params=params)
         return Page[SimplifiedAlbum].model_validate(data["albums"])
