@@ -1,0 +1,10 @@
+{
+  "schema-version": "0.2",
+  "changes": [
+    {
+      "type": "feature",
+      "category": "general",
+      "description": "Initial version of spotify-sdk."
+    }
+  ]
+}

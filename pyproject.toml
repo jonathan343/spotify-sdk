@@ -39,9 +39,11 @@ test = [
     "pytest>=9.0.2",
     "pytest-httpx>=0.36.0",
 ]
-
-[tool.uv]
-default-groups = ["lint", "test"]
+dev = [
+  {include-group = "lint"},
+  {include-group = "test"},
+  "jmeslog>=0.2.0",
+]
 
 [tool.ruff]
 line-length = 79
