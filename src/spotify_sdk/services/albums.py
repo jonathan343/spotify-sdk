@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from .._base_service import BaseService
-from ..models import Album, Page, SimplifiedTrack
+from ..models import Album, Page, SimplifiedAlbum, SimplifiedTrack
 
 
 class AlbumService(BaseService):
@@ -156,3 +156,37 @@ class AlbumService(BaseService):
             f"/albums/{album_id}/tracks", params=params
         )
         return Page[SimplifiedTrack].model_validate(data)
+
+    def get_new_releases(
+        self, limit: int = 20, offset: int = 0
+    ) -> Page[SimplifiedAlbum]:
+        """Get a list of new album releases on Spotify.
+
+        Args:
+            limit: Maximum number of albums to return (1-50, default 20).
+            offset: Index of the first album to return.
+
+        Returns:
+            Paginated list of new album releases.
+        """
+        params = {"limit": limit, "offset": offset}
+        data = self._get(path="/browse/new-releases", params=params)
+        return Page[SimplifiedAlbum].model_validate(data["albums"])
+
+    async def get_new_releases_async(
+        self, limit: int = 20, offset: int = 0
+    ) -> Page[SimplifiedAlbum]:
+        """Get a list of new album releases on Spotify asynchronously.
+
+        Args:
+            limit: Maximum number of albums to return (1-50, default 20).
+            offset: Index of the first album to return.
+
+        Returns:
+            Paginated list of new album releases.
+        """
+        params = {"limit": limit, "offset": offset}
+        data = await self._get_async(
+            path="/browse/new-releases", params=params
+        )
+        return Page[SimplifiedAlbum].model_validate(data["albums"])
