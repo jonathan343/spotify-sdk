@@ -8,7 +8,7 @@ on:
 
 jobs:
   pypi:
-    name: Publish to pypi
+    name: Publish to PyPI
     runs-on: ubuntu-latest
     # Environment and permissions for trusted publishing.
     environment:
