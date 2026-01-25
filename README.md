@@ -206,7 +206,7 @@ cd spotify-sdk
 Install dependencies with [uv](https://github.com/astral-sh/uv):
 
 ```bash
-uv sync --group lint --group test
+uv sync
 ```
 
 Run tests:
