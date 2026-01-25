@@ -1,5 +1,5 @@
 {
   "type": "enhancement",
   "category": "album",
-  "description": "Add `get_new_releases` and `get_new_releases_async` methods to `AlbumService` for retrieving new album releases from Spotify's Browse API.([#13](https://github.com/jonathan343/spotify-sdk/pull/13))."
+  "description": "Add `get_new_releases` and `get_new_releases_async` methods to `AlbumService` for retrieving new album releases from Spotify's Browse API ([#13](https://github.com/jonathan343/spotify-sdk/pull/13))."
 }
