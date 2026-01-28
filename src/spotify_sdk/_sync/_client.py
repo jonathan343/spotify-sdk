@@ -10,18 +10,7 @@ from .services.tracks import TrackService
 
 
 class SpotifyClient:
-    """Main client for interacting with the Spotify API.
-
-    Example:
-        >>> client = SpotifyClient(access_token="your-token")
-        >>> album = client.albums.get("4aawyAB9vmqN3uQ7FjRGTy")
-        >>> print(album.name)
-        "To Pimp a Butterfly"
-
-    Async Example:
-        >>> async with SpotifyClient(access_token="...") as client:
-        ...     album = await client.albums.get_async("4aawyAB9vmqN3uQ7FjRGTy")
-    """
+    """Main client for interacting with the Spotify API."""
 
     def __init__(
         self,
@@ -50,18 +39,8 @@ class SpotifyClient:
         """Close the client and release resources."""
         self._base_client.close()
 
-    async def aclose(self) -> None:
-        """Close the client asynchronously."""
-        await self._base_client.aclose()
-
     def __enter__(self) -> "SpotifyClient":
         return self
 
     def __exit__(self, *args: Any) -> None:
         self.close()
-
-    async def __aenter__(self) -> "SpotifyClient":
-        return self
-
-    async def __aexit__(self, *args: Any) -> None:
-        await self.aclose()

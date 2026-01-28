@@ -1,4 +1,4 @@
-"""Tests for AlbumService."""
+"""Tests for the album service."""
 
 import pytest
 from pytest_httpx import HTTPXMock
@@ -86,15 +86,9 @@ TRACK_RESPONSE = {
 
 class TestAlbumServiceGet:
     def test_get_empty_id_raises_error(self):
-        client = SpotifyClient(access_token="test-token")
-        with pytest.raises(ValueError, match="album_id cannot be empty"):
-            client.albums.get("")
-
-    @pytest.mark.anyio
-    async def test_get_async_empty_id_raises_error(self):
-        async with SpotifyClient(access_token="test-token") as client:
+        with SpotifyClient(access_token="test-token") as client:
             with pytest.raises(ValueError, match="album_id cannot be empty"):
-                await client.albums.get_async("")
+                client.albums.get("")
 
     def test_get_album(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
@@ -102,8 +96,8 @@ class TestAlbumServiceGet:
             json=ALBUM_RESPONSE,
         )
 
-        client = SpotifyClient(access_token="test-token")
-        album = client.albums.get("123")
+        with SpotifyClient(access_token="test-token") as client:
+            album = client.albums.get("123")
 
         assert isinstance(album, Album)
         assert album.id == "123"
@@ -116,36 +110,17 @@ class TestAlbumServiceGet:
             json=ALBUM_RESPONSE,
         )
 
-        client = SpotifyClient(access_token="test-token")
-        album = client.albums.get("123", market="US")
+        with SpotifyClient(access_token="test-token") as client:
+            album = client.albums.get("123", market="US")
 
-        assert album.id == "123"
-
-    @pytest.mark.anyio
-    async def test_get_album_async(self, httpx_mock: HTTPXMock):
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/albums/123",
-            json=ALBUM_RESPONSE,
-        )
-
-        async with SpotifyClient(access_token="test-token") as client:
-            album = await client.albums.get_async("123")
-
-        assert isinstance(album, Album)
         assert album.id == "123"
 
 
 class TestAlbumServiceGetSeveral:
     def test_get_several_empty_list_raises_error(self):
-        client = SpotifyClient(access_token="test-token")
-        with pytest.raises(ValueError, match="album_ids cannot be empty"):
-            client.albums.get_several([])
-
-    @pytest.mark.anyio
-    async def test_get_several_async_empty_list_raises_error(self):
-        async with SpotifyClient(access_token="test-token") as client:
+        with SpotifyClient(access_token="test-token") as client:
             with pytest.raises(ValueError, match="album_ids cannot be empty"):
-                await client.albums.get_several_async([])
+                client.albums.get_several([])
 
     def test_get_several_albums(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
@@ -153,8 +128,8 @@ class TestAlbumServiceGetSeveral:
             json={"albums": [ALBUM_RESPONSE, {**ALBUM_RESPONSE, "id": "456"}]},
         )
 
-        client = SpotifyClient(access_token="test-token")
-        albums = client.albums.get_several(["123", "456"])
+        with SpotifyClient(access_token="test-token") as client:
+            albums = client.albums.get_several(["123", "456"])
 
         assert len(albums) == 2
         assert all(isinstance(a, Album) for a in albums)
@@ -167,35 +142,17 @@ class TestAlbumServiceGetSeveral:
             json={"albums": [ALBUM_RESPONSE]},
         )
 
-        client = SpotifyClient(access_token="test-token")
-        albums = client.albums.get_several(["123"], market="US")
+        with SpotifyClient(access_token="test-token") as client:
+            albums = client.albums.get_several(["123"], market="US")
 
         assert len(albums) == 1
-
-    @pytest.mark.anyio
-    async def test_get_several_async(self, httpx_mock: HTTPXMock):
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/albums?ids=123%2C456",
-            json={"albums": [ALBUM_RESPONSE, {**ALBUM_RESPONSE, "id": "456"}]},
-        )
-
-        async with SpotifyClient(access_token="test-token") as client:
-            albums = await client.albums.get_several_async(["123", "456"])
-
-        assert len(albums) == 2
 
 
 class TestAlbumServiceGetTracks:
     def test_get_tracks_empty_id_raises_error(self):
-        client = SpotifyClient(access_token="test-token")
-        with pytest.raises(ValueError, match="album_id cannot be empty"):
-            client.albums.get_tracks("")
-
-    @pytest.mark.anyio
-    async def test_get_tracks_async_empty_id_raises_error(self):
-        async with SpotifyClient(access_token="test-token") as client:
+        with SpotifyClient(access_token="test-token") as client:
             with pytest.raises(ValueError, match="album_id cannot be empty"):
-                await client.albums.get_tracks_async("")
+                client.albums.get_tracks("")
 
     def test_get_tracks(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
@@ -211,8 +168,8 @@ class TestAlbumServiceGetTracks:
             },
         )
 
-        client = SpotifyClient(access_token="test-token")
-        page = client.albums.get_tracks("123")
+        with SpotifyClient(access_token="test-token") as client:
+            page = client.albums.get_tracks("123")
 
         assert isinstance(page, Page)
         assert page.total == 1
@@ -234,30 +191,9 @@ class TestAlbumServiceGetTracks:
             },
         )
 
-        client = SpotifyClient(access_token="test-token")
-        page = client.albums.get_tracks("123", limit=10, offset=5)
+        with SpotifyClient(access_token="test-token") as client:
+            page = client.albums.get_tracks("123", limit=10, offset=5)
 
         assert page.limit == 10
         assert page.offset == 5
         assert page.total == 16
-
-    @pytest.mark.anyio
-    async def test_get_tracks_async(self, httpx_mock: HTTPXMock):
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/albums/123/tracks?limit=20&offset=0",
-            json={
-                "href": "https://api.spotify.com/v1/albums/123/tracks",
-                "limit": 20,
-                "next": None,
-                "offset": 0,
-                "previous": None,
-                "total": 1,
-                "items": [TRACK_RESPONSE],
-            },
-        )
-
-        async with SpotifyClient(access_token="test-token") as client:
-            page = await client.albums.get_tracks_async("123")
-
-        assert isinstance(page, Page)
-        assert len(page.items) == 1

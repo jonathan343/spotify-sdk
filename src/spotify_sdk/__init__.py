@@ -1,6 +1,7 @@
 """Spotify SDK - A Python client for the Spotify Web API."""
 
-from .client import SpotifyClient
+from ._async._client import AsyncSpotifyClient
+from ._sync._client import SpotifyClient
 from .exceptions import (
     AuthenticationError,
     BadRequestError,
@@ -12,7 +13,8 @@ from .exceptions import (
 )
 
 __all__ = [
-    # Client
+    # Clients
+    "AsyncSpotifyClient",
     "SpotifyClient",
     # Exceptions
     "SpotifyError",

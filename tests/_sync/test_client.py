@@ -1,9 +1,7 @@
-"""Tests for SpotifyClient."""
-
-import pytest
+"""Tests for the Spotify client."""
 
 from spotify_sdk import SpotifyClient
-from spotify_sdk.services.albums import AlbumService
+from spotify_sdk._sync.services.albums import AlbumService
 
 
 class TestSpotifyClientInit:
@@ -29,11 +27,6 @@ class TestSpotifyClientInit:
 
 
 class TestSpotifyClientContextManager:
-    def test_sync_context_manager(self):
+    def test_context_manager(self):
         with SpotifyClient(access_token="test-token") as client:
-            assert isinstance(client, SpotifyClient)
-
-    @pytest.mark.anyio
-    async def test_async_context_manager(self):
-        async with SpotifyClient(access_token="test-token") as client:
             assert isinstance(client, SpotifyClient)

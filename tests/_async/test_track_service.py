@@ -1,8 +1,9 @@
-"""Tests for TrackService."""
+"""Tests for the track service."""
 
+import pytest
 from pytest_httpx import HTTPXMock
 
-from spotify_sdk import SpotifyClient
+from spotify_sdk import AsyncSpotifyClient
 from spotify_sdk.models import Track
 
 TRACK_RESPONSE = {
@@ -63,14 +64,15 @@ TRACK_RESPONSE = {
 
 
 class TestTrackServiceGet:
-    def test_get_track(self, httpx_mock: HTTPXMock):
+    @pytest.mark.anyio
+    async def test_get_track(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             url="https://api.spotify.com/v1/tracks/789",
             json=TRACK_RESPONSE,
         )
 
-        client = SpotifyClient(access_token="test-token")
-        track = client.tracks.get("789")
+        async with AsyncSpotifyClient(access_token="test-token") as client:
+            track = await client.tracks.get("789")
 
         assert isinstance(track, Track)
         assert track.id == "789"
@@ -78,19 +80,24 @@ class TestTrackServiceGet:
 
 
 class TestTrackServiceGetSeveral:
-    def test_get_several_tracks(self, httpx_mock: HTTPXMock):
+    @pytest.mark.anyio
+    async def test_get_several_tracks(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             url="https://api.spotify.com/v1/tracks?ids=789%2C012",
             json={
                 "tracks": [
                     TRACK_RESPONSE,
-                    {**TRACK_RESPONSE, "id": "012", "name": "For Free?"},
+                    {
+                        **TRACK_RESPONSE,
+                        "id": "012",
+                        "name": "For Free?",
+                    },
                 ]
             },
         )
 
-        client = SpotifyClient(access_token="test-token")
-        tracks = client.tracks.get_several(["789", "012"])
+        async with AsyncSpotifyClient(access_token="test-token") as client:
+            tracks = await client.tracks.get_several(["789", "012"])
 
         assert len(tracks) == 2
         assert all(isinstance(t, Track) for t in tracks)

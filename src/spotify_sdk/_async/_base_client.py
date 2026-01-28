@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import random
-import time
 from typing import Any
 
+import anyio
 import httpx
 
-from .exceptions import (
+from ..exceptions import (
     AuthenticationError,
     BadRequestError,
     ForbiddenError,
@@ -19,7 +19,7 @@ from .exceptions import (
 )
 
 
-class BaseClient:
+class AsyncBaseClient:
     """Low-level HTTP client for Spotify API."""
 
     BASE_URL = "https://api.spotify.com/v1"
@@ -48,30 +48,18 @@ class BaseClient:
         self._max_retries = (
             max_retries if max_retries is not None else self.MAX_RETRIES
         )
-        self._client: httpx.Client | None = None
-        self._async_client: httpx.AsyncClient | None = None
+        self._client: httpx.AsyncClient | None = None
 
     @property
-    def _sync_client(self) -> httpx.Client:
-        """Lazily initialize and return the sync HTTP client."""
+    def _http_client(self) -> httpx.AsyncClient:
+        """Lazily initialize and return the async HTTP client."""
         if self._client is None:
-            self._client = httpx.Client(
+            self._client = httpx.AsyncClient(
                 base_url=self.BASE_URL,
                 timeout=self._timeout,
                 headers=self._default_headers(),
             )
         return self._client
-
-    @property
-    def _async_http_client(self) -> httpx.AsyncClient:
-        """Lazily initialize and return the async HTTP client."""
-        if self._async_client is None:
-            self._async_client = httpx.AsyncClient(
-                base_url=self.BASE_URL,
-                timeout=self._timeout,
-                headers=self._default_headers(),
-            )
-        return self._async_client
 
     def _default_headers(self) -> dict[str, str]:
         """Return default headers for all requests."""
@@ -80,16 +68,16 @@ class BaseClient:
             "Content-Type": "application/json",
         }
 
-    def request(
+    async def request(
         self,
         method: str,
         path: str,
         params: dict[str, Any] | None = None,
         json: dict[str, Any] | None = None,
-        timeout: float | None = None,
+        timeout: float | None = None,  # noqa: ASYNC109
         max_retries: int | None = None,
     ) -> dict[str, Any]:
-        """Make a synchronous HTTP request to the Spotify API.
+        """Make an HTTP request to the Spotify API.
 
         Args:
             method: HTTP method (GET, POST, PUT, DELETE).
@@ -110,7 +98,7 @@ class BaseClient:
 
         for attempt in range(retries + 1):
             try:
-                response = self._sync_client.request(
+                response = await self._http_client.request(
                     method=method,
                     url=path,
                     params=self._clean_params(params),
@@ -122,7 +110,7 @@ class BaseClient:
             except (httpx.ConnectError, httpx.TimeoutException) as e:
                 last_exception = e
                 if attempt < retries:
-                    self._sleep_with_backoff(attempt)
+                    await anyio.sleep(self._calculate_backoff(attempt))
                     continue
                 raise SpotifyError(f"Connection error: {e}") from e
 
@@ -132,81 +120,14 @@ class BaseClient:
                     sleep_time = e.retry_after or self._calculate_backoff(
                         attempt
                     )
-                    time.sleep(sleep_time)
+                    await anyio.sleep(sleep_time)
                     continue
                 raise
 
             except ServerError as e:
                 last_exception = e
                 if attempt < retries:
-                    self._sleep_with_backoff(attempt)
-                    continue
-                raise
-
-        raise last_exception or SpotifyError("Request failed after retries")
-
-    async def request_async(
-        self,
-        method: str,
-        path: str,
-        params: dict[str, Any] | None = None,
-        json: dict[str, Any] | None = None,
-        timeout: float | None = None,
-        max_retries: int | None = None,
-    ) -> dict[str, Any]:
-        """Make an asynchronous HTTP request to the Spotify API.
-
-        Args:
-            method: HTTP method (GET, POST, PUT, DELETE).
-            path: API endpoint path.
-            params: Query parameters.
-            json: JSON body for POST/PUT requests.
-            timeout: Request timeout override.
-            max_retries: Max retries override.
-
-        Returns:
-            Parsed JSON response.
-
-        Raises:
-            SpotifyError: On API errors.
-        """
-        import asyncio
-
-        retries = max_retries if max_retries is not None else self._max_retries
-        last_exception: Exception | None = None
-
-        for attempt in range(retries + 1):
-            try:
-                response = await self._async_http_client.request(
-                    method=method,
-                    url=path,
-                    params=self._clean_params(params),
-                    json=json,
-                    timeout=timeout,
-                )
-                return self._handle_response(response)
-
-            except (httpx.ConnectError, httpx.TimeoutException) as e:
-                last_exception = e
-                if attempt < retries:
-                    await asyncio.sleep(self._calculate_backoff(attempt))
-                    continue
-                raise SpotifyError(f"Connection error: {e}") from e
-
-            except RateLimitError as e:
-                last_exception = e
-                if attempt < retries:
-                    sleep_time = e.retry_after or self._calculate_backoff(
-                        attempt
-                    )
-                    await asyncio.sleep(sleep_time)
-                    continue
-                raise
-
-            except ServerError as e:
-                last_exception = e
-                if attempt < retries:
-                    await asyncio.sleep(self._calculate_backoff(attempt))
+                    await anyio.sleep(self._calculate_backoff(attempt))
                     continue
                 raise
 
@@ -276,30 +197,14 @@ class BaseClient:
         # Add jitter (0.5 to 1.0 multiplier)
         return backoff * (0.5 + random.random() * 0.5)
 
-    def _sleep_with_backoff(self, attempt: int) -> None:
-        """Sleep with exponential backoff."""
-        time.sleep(self._calculate_backoff(attempt))
-
-    def close(self) -> None:
+    async def close(self) -> None:
         """Close the HTTP client."""
         if self._client is not None:
-            self._client.close()
+            await self._client.aclose()
             self._client = None
 
-    async def aclose(self) -> None:
-        """Close the async HTTP client."""
-        if self._async_client is not None:
-            await self._async_client.aclose()
-            self._async_client = None
-
-    def __enter__(self) -> "BaseClient":
-        return self
-
-    def __exit__(self, *args: Any) -> None:
-        self.close()
-
-    async def __aenter__(self) -> "BaseClient":
+    async def __aenter__(self) -> "AsyncBaseClient":
         return self
 
     async def __aexit__(self, *args: Any) -> None:
-        await self.aclose()
+        await self.close()

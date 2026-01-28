@@ -12,7 +12,7 @@ A Python SDK for the [Spotify Web API](https://developer.spotify.com/documentati
 ## Features
 
 - **Type-safe**: Full type hints with Pydantic models for all API responses
-- **Sync and async**: Both synchronous and asynchronous client support
+- **Sync and async**: Dedicated `SpotifyClient` and `AsyncSpotifyClient` classes
 - **Automatic retries**: Exponential backoff with jitter for rate limits and transient errors
 - **Context managers**: Clean resource management with `with` and `async with` support
 
@@ -52,8 +52,9 @@ from spotify_sdk import SpotifyClient
 client = SpotifyClient(access_token="your-access-token")
 
 # Get an album
-album = client.albums.get("4aawyAB9vmqN3uQ7FjRGTy")
-print(album.name)  # "Global Warming"
+album = client.albums.get("5K79FLRUCSysQnVESLcTdb")
+print(f"{album.name} by {album.artists[0].name}")
+# Output: "DeBÍ TiRAR MáS FOToS by Bad Bunny"
 
 # Get album tracks
 tracks = client.albums.get_tracks(album.id)
@@ -77,20 +78,13 @@ with SpotifyClient(access_token="your-access-token") as client:
 
 ```python
 import asyncio
-from spotify_sdk import SpotifyClient
+from spotify_sdk import AsyncSpotifyClient
 
 async def main():
-    async with SpotifyClient(access_token="your-access-token") as client:
-        album = await client.albums.get_async("4aawyAB9vmqN3uQ7FjRGTy")
-        print(album.name)
-
-        # Fetch multiple albums concurrently
-        albums = await client.albums.get_several_async([
-            "4aawyAB9vmqN3uQ7FjRGTy",
-            "2noRn2Aes5aoNVsU6iWThc",
-        ])
-        for album in albums:
-            print(album.name)
+    async with AsyncSpotifyClient(access_token="your-access-token") as client:
+        album = await client.albums.get("4Uv86qWpGTxf7fU7lG5X6F")
+        print(f"{album.name} by {album.artists[0].name}")
+        # "The College Dropout by Kanye West"
 
 asyncio.run(main())
 ```
@@ -220,6 +214,22 @@ Run linting:
 ```bash
 uv run ruff check .
 uv run ruff format --check --preview .
+```
+
+### Sync/Async Architecture
+
+The SDK uses an async-first architecture. Async code under `src/spotify_sdk/_async/` is the source of truth, and the sync code under `src/spotify_sdk/_sync/` is auto-generated using [unasync](https://github.com/python-trio/unasync). **Do not edit `_sync/` files directly.**
+
+After making changes to `_async/` source or `tests/_async/`, regenerate the sync code:
+
+```bash
+uv run python scripts/run_unasync.py
+```
+
+To verify sync code is up to date (same check that runs in CI):
+
+```bash
+uv run python scripts/run_unasync.py --check
 ```
 
 ## License
