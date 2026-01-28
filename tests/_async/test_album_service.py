@@ -1,4 +1,4 @@
-"""Tests for AsyncAlbumService."""
+"""Tests for the album service."""
 
 import pytest
 from pytest_httpx import HTTPXMock

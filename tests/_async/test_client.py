@@ -1,4 +1,4 @@
-"""Tests for AsyncSpotifyClient."""
+"""Tests for the Spotify client."""
 
 import pytest
 

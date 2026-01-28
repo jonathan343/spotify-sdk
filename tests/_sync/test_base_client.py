@@ -1,4 +1,4 @@
-"""Tests for AsyncBaseClient."""
+"""Tests for the base client."""
 
 from unittest.mock import patch
 

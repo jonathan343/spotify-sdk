@@ -10,14 +10,7 @@ from .services.tracks import TrackService
 
 
 class SpotifyClient:
-    """Main client for interacting with the Spotify API.
-
-    Example:
-        >>> async with AsyncSpotifyClient(access_token="...") as client:
-        ...     album = await client.albums.get("4aawyAB9vmqN3uQ7FjRGTy")
-        ...     print(album.name)
-        "To Pimp a Butterfly"
-    """
+    """Main client for interacting with the Spotify API."""
 
     def __init__(
         self,

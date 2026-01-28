@@ -1,4 +1,4 @@
-"""Tests for AsyncTrackService."""
+"""Tests for the track service."""
 
 import pytest
 from pytest_httpx import HTTPXMock

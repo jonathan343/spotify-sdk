@@ -1,4 +1,4 @@
-"""Tests for AsyncSpotifyClient."""
+"""Tests for the Spotify client."""
 
 from spotify_sdk import SpotifyClient
 from spotify_sdk._sync.services.albums import AlbumService
