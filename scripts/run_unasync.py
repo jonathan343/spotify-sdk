@@ -137,15 +137,13 @@ def run(check: bool = False) -> None:
 
         if check:
             try:
-                subprocess.check_call(
-                    [
-                        "diff",
-                        "-r",
-                        "--exclude=__pycache__",
-                        str(committed_dir),
-                        str(output_dir),
-                    ]
-                )
+                subprocess.check_call([
+                    "diff",
+                    "-r",
+                    "--exclude=__pycache__",
+                    str(committed_dir),
+                    str(output_dir),
+                ])
             except subprocess.CalledProcessError:
                 shutil.rmtree(output_dir)
                 print(
