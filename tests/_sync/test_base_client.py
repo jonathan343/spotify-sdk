@@ -1,4 +1,4 @@
-"""Tests for BaseClient."""
+"""Tests for AsyncBaseClient."""
 
 from unittest.mock import patch
 
@@ -14,7 +14,7 @@ from spotify_sdk import (
     ServerError,
     SpotifyError,
 )
-from spotify_sdk._base_client import BaseClient
+from spotify_sdk._sync._base_client import BaseClient
 
 
 class TestBaseClientInit:
@@ -53,6 +53,7 @@ class TestBaseClientRequest:
         result = client.request("GET", "/albums/123")
 
         assert result == {"id": "123", "name": "Test Album"}
+        client.close()
 
     def test_successful_post_request(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
@@ -67,6 +68,7 @@ class TestBaseClientRequest:
         )
 
         assert result == {"id": "456", "name": "New Playlist"}
+        client.close()
 
     def test_query_params(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
@@ -78,6 +80,7 @@ class TestBaseClientRequest:
         result = client.request("GET", "/albums/123", params={"market": "US"})
 
         assert result == {"id": "123"}
+        client.close()
 
     def test_none_params_are_filtered(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
@@ -87,10 +90,13 @@ class TestBaseClientRequest:
 
         client = BaseClient(access_token="test-token")
         result = client.request(
-            "GET", "/albums/123", params={"market": "US", "other": None}
+            "GET",
+            "/albums/123",
+            params={"market": "US", "other": None},
         )
 
         assert result == {"id": "123"}
+        client.close()
 
     def test_204_returns_empty_dict(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
@@ -103,6 +109,7 @@ class TestBaseClientRequest:
         result = client.request("DELETE", "/playlists/123")
 
         assert result == {}
+        client.close()
 
 
 class TestBaseClientErrors:
@@ -224,6 +231,7 @@ class TestBaseClientRetry:
         result = client.request("GET", "/albums/123")
 
         assert result == {"id": "123", "name": "Test Album"}
+        client.close()
 
     def test_exhausts_retries_on_persistent_error(self, httpx_mock: HTTPXMock):
         # All requests fail
@@ -256,8 +264,8 @@ class TestBaseClientRetry:
             json={"id": "123", "name": "Test Album"},
         )
 
-        client = BaseClient(access_token="test-token", max_retries=1)
-        result = client.request("GET", "/albums/123")
+        with BaseClient(access_token="test-token", max_retries=1) as client:
+            result = client.request("GET", "/albums/123")
 
         assert result == {"id": "123", "name": "Test Album"}
         mock_sleep.assert_called_once_with(2)
@@ -280,16 +288,16 @@ class TestBaseClientRetry:
             json={"error": {"message": "Rate limit exceeded"}},
         )
 
-        client = BaseClient(access_token="test-token", max_retries=1)
-        with pytest.raises(RateLimitError) as exc_info:
-            client.request("GET", "/albums/123")
+        with BaseClient(access_token="test-token", max_retries=1) as client:
+            with pytest.raises(RateLimitError) as exc_info:
+                client.request("GET", "/albums/123")
 
         assert exc_info.value.retry_after == 5
         mock_sleep.assert_called_once_with(5)
 
 
 class TestBaseClientContextManager:
-    def test_sync_context_manager(self, httpx_mock: HTTPXMock):
+    def test_context_manager(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             url="https://api.spotify.com/v1/albums/123",
             json={"id": "123"},
@@ -298,82 +306,3 @@ class TestBaseClientContextManager:
         with BaseClient(access_token="test-token") as client:
             result = client.request("GET", "/albums/123")
             assert result == {"id": "123"}
-
-
-class TestBaseClientAsync:
-    @pytest.mark.anyio
-    async def test_async_request(self, httpx_mock: HTTPXMock):
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/albums/123",
-            json={"id": "123", "name": "Test Album"},
-        )
-
-        client = BaseClient(access_token="test-token")
-        result = await client.request_async("GET", "/albums/123")
-
-        assert result == {"id": "123", "name": "Test Album"}
-        await client.aclose()
-
-    @pytest.mark.anyio
-    async def test_async_context_manager(self, httpx_mock: HTTPXMock):
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/albums/123",
-            json={"id": "123"},
-        )
-
-        async with BaseClient(access_token="test-token") as client:
-            result = await client.request_async("GET", "/albums/123")
-            assert result == {"id": "123"}
-
-    @pytest.mark.anyio
-    @patch("asyncio.sleep")
-    async def test_async_retries_on_rate_limit(
-        self, mock_sleep, httpx_mock: HTTPXMock
-    ):
-        # First request returns 429, second succeeds
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/albums/123",
-            status_code=429,
-            headers={"Retry-After": "3"},
-            json={"error": {"message": "Rate limit exceeded"}},
-        )
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/albums/123",
-            json={"id": "123", "name": "Test Album"},
-        )
-
-        async with BaseClient(
-            access_token="test-token", max_retries=1
-        ) as client:
-            result = await client.request_async("GET", "/albums/123")
-
-        assert result == {"id": "123", "name": "Test Album"}
-        mock_sleep.assert_called_once_with(3)
-
-    @pytest.mark.anyio
-    @patch("asyncio.sleep")
-    async def test_async_exhausts_retries_on_persistent_rate_limit(
-        self, mock_sleep, httpx_mock: HTTPXMock
-    ):
-        # All requests return 429
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/albums/123",
-            status_code=429,
-            headers={"Retry-After": "10"},
-            json={"error": {"message": "Rate limit exceeded"}},
-        )
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/albums/123",
-            status_code=429,
-            headers={"Retry-After": "10"},
-            json={"error": {"message": "Rate limit exceeded"}},
-        )
-
-        async with BaseClient(
-            access_token="test-token", max_retries=1
-        ) as client:
-            with pytest.raises(RateLimitError) as exc_info:
-                await client.request_async("GET", "/albums/123")
-
-        assert exc_info.value.retry_after == 10
-        mock_sleep.assert_called_once_with(10)

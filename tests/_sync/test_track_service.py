@@ -1,4 +1,4 @@
-"""Tests for TrackService."""
+"""Tests for AsyncTrackService."""
 
 from pytest_httpx import HTTPXMock
 
@@ -69,8 +69,8 @@ class TestTrackServiceGet:
             json=TRACK_RESPONSE,
         )
 
-        client = SpotifyClient(access_token="test-token")
-        track = client.tracks.get("789")
+        with SpotifyClient(access_token="test-token") as client:
+            track = client.tracks.get("789")
 
         assert isinstance(track, Track)
         assert track.id == "789"
@@ -84,13 +84,17 @@ class TestTrackServiceGetSeveral:
             json={
                 "tracks": [
                     TRACK_RESPONSE,
-                    {**TRACK_RESPONSE, "id": "012", "name": "For Free?"},
+                    {
+                        **TRACK_RESPONSE,
+                        "id": "012",
+                        "name": "For Free?",
+                    },
                 ]
             },
         )
 
-        client = SpotifyClient(access_token="test-token")
-        tracks = client.tracks.get_several(["789", "012"])
+        with SpotifyClient(access_token="test-token") as client:
+            tracks = client.tracks.get_several(["789", "012"])
 
         assert len(tracks) == 2
         assert all(isinstance(t, Track) for t in tracks)
