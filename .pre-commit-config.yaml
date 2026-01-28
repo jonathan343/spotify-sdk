@@ -1,0 +1,38 @@
+fail_fast: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.24.1
+    hooks:
+      - id: validate-pyproject
+
+  # zizmor detects security vulnerabilities in GitHub Actions workflows.
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.22.0
+    hooks:
+      - id: zizmor
+
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    # uv version.
+    rev: 0.9.27
+    hooks:
+      # Update the uv lockfile
+      - id: uv-lock
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.14.14
+    hooks:
+      # Run the linter.
+      - id: ruff-check
+        args: [ --fix ]
+      # Run the formatter.
+      - id: ruff-format
+        args: [ --preview ]
