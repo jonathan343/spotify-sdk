@@ -99,13 +99,13 @@ def post_process(output_dir: Path) -> None:
 def format_output(output_dir: Path) -> None:
     """Run ruff format and fix on the output directory."""
     subprocess.run(
-        ["ruff", "format", str(output_dir)],
-        check=True,
+        ["ruff", "check", "--fix", str(output_dir)],
+        check=False,
         capture_output=True,
     )
     subprocess.run(
-        ["ruff", "check", "--fix", str(output_dir)],
-        check=False,
+        ["ruff", "format", str(output_dir)],
+        check=True,
         capture_output=True,
     )
 
