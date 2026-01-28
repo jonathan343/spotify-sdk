@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.0
+
+### Breaking Changes
+* Replace dual-mode `SpotifyClient` with separate `AsyncSpotifyClient` and `SpotifyClient` classes; async methods no longer use `_async` suffix. ([#21](https://github.com/jonathan343/spotify-sdk/pull/21))
+
+### Enhancements
+* Async client now supports trio in addition to asyncio as a backend. ([#21](https://github.com/jonathan343/spotify-sdk/pull/21))
+
 ## v0.1.1
 
 ### Enhancements
