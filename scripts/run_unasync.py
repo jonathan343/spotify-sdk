@@ -148,7 +148,7 @@ def run(check: bool = False) -> None:
                 shutil.rmtree(output_dir)
                 print(
                     f"DRIFT DETECTED: {committed_dir} is out of date. "
-                    f"Run 'python scripts/unasync.py' to regenerate."
+                    f"Run 'python scripts/run_unasync.py' to regenerate."
                 )
                 sys.exit(1)
             finally:
