@@ -1,0 +1,210 @@
+"""Base HTTP client for Spotify API communication."""
+
+from __future__ import annotations
+
+import random
+import time
+from typing import Any
+
+import httpx
+
+from ..exceptions import (
+    AuthenticationError,
+    BadRequestError,
+    ForbiddenError,
+    NotFoundError,
+    RateLimitError,
+    ServerError,
+    SpotifyError,
+)
+
+
+class BaseClient:
+    """Low-level HTTP client for Spotify API."""
+
+    BASE_URL = "https://api.spotify.com/v1"
+
+    # Retry configuration
+    MAX_RETRIES = 3
+    INITIAL_BACKOFF = 0.5
+    MAX_BACKOFF = 8.0
+    BACKOFF_MULTIPLIER = 2
+
+    def __init__(
+        self,
+        access_token: str,
+        timeout: float = 30.0,
+        max_retries: int | None = None,
+    ) -> None:
+        """Initialize the base client.
+
+        Args:
+            access_token: Spotify API access token.
+            timeout: Default request timeout in seconds.
+            max_retries: Maximum number of retries for failed requests.
+        """
+        self._access_token = access_token
+        self._timeout = timeout
+        self._max_retries = (
+            max_retries if max_retries is not None else self.MAX_RETRIES
+        )
+        self._client: httpx.Client | None = None
+
+    @property
+    def _http_client(self) -> httpx.Client:
+        """Lazily initialize and return the async HTTP client."""
+        if self._client is None:
+            self._client = httpx.Client(
+                base_url=self.BASE_URL,
+                timeout=self._timeout,
+                headers=self._default_headers(),
+            )
+        return self._client
+
+    def _default_headers(self) -> dict[str, str]:
+        """Return default headers for all requests."""
+        return {
+            "Authorization": f"Bearer {self._access_token}",
+            "Content-Type": "application/json",
+        }
+
+    def request(
+        self,
+        method: str,
+        path: str,
+        params: dict[str, Any] | None = None,
+        json: dict[str, Any] | None = None,
+        timeout: float | None = None,  # noqa: ASYNC109
+        max_retries: int | None = None,
+    ) -> dict[str, Any]:
+        """Make an HTTP request to the Spotify API.
+
+        Args:
+            method: HTTP method (GET, POST, PUT, DELETE).
+            path: API endpoint path.
+            params: Query parameters.
+            json: JSON body for POST/PUT requests.
+            timeout: Request timeout override.
+            max_retries: Max retries override.
+
+        Returns:
+            Parsed JSON response.
+
+        Raises:
+            SpotifyError: On API errors.
+        """
+        retries = max_retries if max_retries is not None else self._max_retries
+        last_exception: Exception | None = None
+
+        for attempt in range(retries + 1):
+            try:
+                response = self._http_client.request(
+                    method=method,
+                    url=path,
+                    params=self._clean_params(params),
+                    json=json,
+                    timeout=timeout,
+                )
+                return self._handle_response(response)
+
+            except (httpx.ConnectError, httpx.TimeoutException) as e:
+                last_exception = e
+                if attempt < retries:
+                    time.sleep(self._calculate_backoff(attempt))
+                    continue
+                raise SpotifyError(f"Connection error: {e}") from e
+
+            except RateLimitError as e:
+                last_exception = e
+                if attempt < retries:
+                    sleep_time = e.retry_after or self._calculate_backoff(
+                        attempt
+                    )
+                    time.sleep(sleep_time)
+                    continue
+                raise
+
+            except ServerError as e:
+                last_exception = e
+                if attempt < retries:
+                    time.sleep(self._calculate_backoff(attempt))
+                    continue
+                raise
+
+        raise last_exception or SpotifyError("Request failed after retries")
+
+    def _handle_response(self, response: httpx.Response) -> dict[str, Any]:
+        """Process HTTP response and raise appropriate exceptions."""
+        if response.status_code == 204:
+            return {}
+
+        try:
+            data = response.json()
+        except Exception:
+            data = {}
+
+        if response.is_success:
+            return data
+
+        error_message = self._extract_error_message(data)
+
+        if response.status_code == 400:
+            raise BadRequestError(error_message, response.status_code, data)
+        elif response.status_code == 401:
+            raise AuthenticationError(
+                error_message, response.status_code, data
+            )
+        elif response.status_code == 403:
+            raise ForbiddenError(error_message, response.status_code, data)
+        elif response.status_code == 404:
+            raise NotFoundError(error_message, response.status_code, data)
+        elif response.status_code == 429:
+            retry_after = int(response.headers.get("Retry-After", 1))
+            raise RateLimitError(
+                error_message,
+                response.status_code,
+                data,
+                retry_after=retry_after,
+            )
+        elif response.status_code >= 500:
+            raise ServerError(error_message, response.status_code, data)
+        else:
+            raise SpotifyError(error_message, response.status_code, data)
+
+    def _extract_error_message(self, data: dict[str, Any]) -> str:
+        """Extract error message from Spotify error response."""
+        if "error" in data:
+            error = data["error"]
+            if isinstance(error, dict):
+                return error.get("message", "Unknown error")
+            return str(error)
+        return "Unknown error"
+
+    def _clean_params(
+        self, params: dict[str, Any] | None
+    ) -> dict[str, Any] | None:
+        """Remove None values from query parameters."""
+        if params is None:
+            return None
+        return {k: v for k, v in params.items() if v is not None}
+
+    def _calculate_backoff(self, attempt: int) -> float:
+        """Calculate backoff time with jitter."""
+        backoff = min(
+            self.INITIAL_BACKOFF * (self.BACKOFF_MULTIPLIER**attempt),
+            self.MAX_BACKOFF,
+        )
+        # Add jitter (0.5 to 1.0 multiplier)
+        return backoff * (0.5 + random.random() * 0.5)
+
+    def close(self) -> None:
+        """Close the HTTP client."""
+        if self._client is not None:
+            self._client.close()
+            self._client = None
+
+    def __enter__(self) -> "BaseClient":
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        self.close()
