@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
+from typing import Literal, get_args
+
 from ...models import Artist, Page, SimplifiedAlbum
 from .._base_service import BaseService
+
+IncludeGroup = Literal["album", "single", "appears_on", "compilation"]
+VALID_INCLUDE_GROUPS = set(get_args(IncludeGroup))
 
 
 class ArtistService(BaseService):
@@ -46,7 +51,7 @@ class ArtistService(BaseService):
     def get_albums(
         self,
         id: str,
-        include_groups: str | None = None,
+        include_groups: list[IncludeGroup] | None = None,
         market: str | None = None,
         limit: int | None = None,
         offset: int | None = None,
@@ -55,7 +60,7 @@ class ArtistService(BaseService):
 
         Args:
             id: The Spotify ID of the artist.
-            include_groups: Comma-separated list to filter album types. Valid values:
+            include_groups: A list of keywords to filter album types. Valid values:
                 album, single, appears_on, compilation. If omitted, all types are returned.
             market: An ISO 3166-1 alpha-2 country code for track relinking.
             limit: Maximum number of albums to return (1-50, server-side default of 20).
@@ -65,13 +70,18 @@ class ArtistService(BaseService):
             The albums for the requested artist.
 
         Raises:
-            ValueError: If id is empty.
+            ValueError: If id is empty or include_groups contains invalid values.
         """
         if not id:
             raise ValueError("id cannot be empty")
         params: dict[str, str | int] = {}
         if include_groups is not None:
-            params["include_groups"] = include_groups
+            invalid = set(include_groups) - VALID_INCLUDE_GROUPS
+            if invalid:
+                raise ValueError(
+                    f"Invalid include_groups: {invalid}. Valid values: {VALID_INCLUDE_GROUPS}"
+                )
+            params["include_groups"] = ",".join(include_groups)
         if market is not None:
             params["market"] = market
         if limit is not None:
