@@ -94,14 +94,14 @@ class AsyncArtistService(AsyncBaseService):
     async def get_top_tracks(
         self, id: str, market: str | None = None
     ) -> list[Track]:
-        """Get an artists top tracks for a given market.
+        """Get an artist's top tracks for a given market.
 
         Args:
             id: The Spotify ID of the artist.
             market: An ISO 3166-1 alpha-2 country code for the requested content.
 
         Returns:
-            The top tracks for the artists.
+            The top tracks for the artist.
 
         Raises:
             ValueError: If id is empty.
