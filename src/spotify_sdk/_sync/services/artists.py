@@ -6,7 +6,7 @@ from ...models import Artist, Page, SimplifiedAlbum
 from .._base_service import BaseService
 
 
-class SyncArtistService(BaseService):
+class ArtistService(BaseService):
     """Operations for Spotify artists."""
 
     def get(self, id: str) -> Artist:
