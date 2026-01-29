@@ -1,5 +1,5 @@
 {
   "type": "feature",
   "category": "artists",
-  "description": "Added `ArtistService` (sync) and `AsyncArtistService` (async) with methods for fetching an artist by ID, fetching multiple artists (up to 50), and listing an artist's albums with optional filtering by type, market, limit, and offset. ([#25](https://github.com/jonathan343/spotify-sdk/pull/25))"
+  "description": "Added `ArtistService` (sync) and `AsyncArtistService` (async) with methods for fetching an artist by ID, fetching multiple artists (up to 50), listing an artist's albums, and getting their top tracks. ([#25](https://github.com/jonathan343/spotify-sdk/pull/25))"
 }
