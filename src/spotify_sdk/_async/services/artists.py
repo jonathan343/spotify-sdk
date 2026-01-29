@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal, get_args
 
-from ...models import Artist, Page, SimplifiedAlbum
+from ...models import Artist, Page, SimplifiedAlbum, Track
 from .._base_service import AsyncBaseService
 
 IncludeGroup = Literal["album", "single", "appears_on", "compilation"]
@@ -62,7 +62,7 @@ class AsyncArtistService(AsyncBaseService):
             id: The Spotify ID of the artist.
             include_groups: A list of keywords to filter album types. Valid values:
                 album, single, appears_on, compilation. If omitted, all types are returned.
-            market: An ISO 3166-1 alpha-2 country code for track relinking.
+            market: An ISO 3166-1 alpha-2 country code for the requested content.
             limit: Maximum number of albums to return (1-50, server-side default of 20).
             offset: Index of the first album to return (server-side default of 0).
 
@@ -90,3 +90,26 @@ class AsyncArtistService(AsyncBaseService):
             params["offset"] = offset
         data = await self._get(f"/artists/{id}/albums", params=params)
         return Page[SimplifiedAlbum].model_validate(data)
+
+    async def get_top_tracks(
+        self, id: str, market: str | None = None
+    ) -> list[Track]:
+        """Get an artists top tracks for a given market.
+
+        Args:
+            id: The Spotify ID of the artist.
+            market: An ISO 3166-1 alpha-2 country code for the requested content.
+
+        Returns:
+            The top tracks for the artists.
+
+        Raises:
+            ValueError: If id is empty.
+        """
+        if not id:
+            raise ValueError("id cannot be empty")
+        params: dict[str, str] = {}
+        if market is not None:
+            params["market"] = market
+        data = await self._get(f"/artists/{id}/top-tracks", params=params)
+        return [Track.model_validate(a) for a in data["tracks"]]

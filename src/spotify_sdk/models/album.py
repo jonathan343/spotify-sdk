@@ -22,7 +22,7 @@ class SimplifiedAlbum(SpotifyModel):
 
     album_type: str
     total_tracks: int
-    available_markets: list[str]
+    available_markets: list[str] | None = None
     external_urls: ExternalUrls
     href: str
     id: str

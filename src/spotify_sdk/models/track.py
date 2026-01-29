@@ -12,7 +12,7 @@ class SimplifiedTrack(SpotifyModel):
     """Basic track info embedded in other objects."""
 
     artists: list[SimplifiedArtist]
-    available_markets: list[str]
+    available_markets: list[str] | None = None
     disc_number: int
     duration_ms: int
     explicit: bool
