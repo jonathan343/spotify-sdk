@@ -1,0 +1,203 @@
+[project]
+
+# General
+site_name = "Spotify SDK"
+site_description = "Documentation for spotify-sdk - A Python SDK for the Spotify Web API."
+site_author = "Jonathan Gaytan"
+edit_uri = "edit/main/docs/"
+
+# Repository
+repo_name = "jonathan343/spotify-sdk"
+repo_url = "https://github.com/jonathan343/spotify-sdk"
+# TODO: Update site_url when publishing docs
+
+# Copyright
+#site_url = "https://www.example.com/"
+copyright = """
+Copyright &copy; 2026 Jonathan Gaytan
+"""
+
+
+# ----------------------------------------------------------------------------
+# Section for configuring theme options
+# ----------------------------------------------------------------------------
+[project.theme]
+
+# TODO: Create favicon
+#favicon = "images/favicon.png"
+
+language = "en"
+
+# Zensical provides a number of feature toggles that change the behavior
+# of the documentation site.
+features = [
+    # Zensical includes an announcement bar. This feature allows users to
+    # dismiss it then they have read the announcement.
+    # https://zensical.org/docs/setup/header/#announcement-bar
+    "announce.dismiss",
+
+    # If you have a repository configured and turn on this feature, Zensical
+    # will generate an edit button for the page. This works for common
+    # repository hosting services.
+    # https://zensical.org/docs/setup/repository/#code-actions
+    "content.action.edit",
+
+    # If you have a repository configured and turn on this feature, Zensical
+    # will generate a button that allows the user to view the Markdown
+    # code for the current page.
+    # https://zensical.org/docs/setup/repository/#code-actions
+    "content.action.view",
+
+    # Code annotations allow you to add an icon with a tooltip to your
+    # code blocks to provide explanations at crucial points.
+    # https://zensical.org/docs/authoring/code-blocks/#code-annotations
+    "content.code.annotate",
+
+    # This feature turns on a button in code blocks that allow users to
+    # copy the content to their clipboard without first selecting it.
+    # https://zensical.org/docs/authoring/code-blocks/#code-copy-button
+    "content.code.copy",
+
+    # Code blocks can include a button to allow for the selection of line
+    # ranges by the user.
+    # https://zensical.org/docs/authoring/code-blocks/#code-selection-button
+    "content.code.select",
+
+    # Zensical can render footnotes as inline tooltips, so the user can read
+    # the footnote without leaving the context of the document.
+    # https://zensical.org/docs/authoring/footnotes/#footnote-tooltips
+    "content.footnote.tooltips",
+
+    # If you have many content tabs that have the same titles (e.g., "Python",
+    # "JavaScript", "Cobol"), this feature causes all of them to switch to
+    # at the same time when the user chooses their language in one.
+    # https://zensical.org/docs/authoring/content-tabs/#linked-content-tabs
+    "content.tabs.link",
+
+    # TODO: not sure I understand this one? Is there a demo of this in the docs?
+    # https://zensical.org/docs/authoring/tooltips/#improved-tooltips
+    "content.tooltips",
+
+    # Turn on this feature to expand all collapsible sections in the
+    # navigation sidebar by default.
+    # https://zensical.org/docs/setup/navigation/#navigation-expansion
+    # "navigation.expand",
+
+    # This feature turns on navigation elements in the footer that allow the
+    # user to navigate to a next or previous page.
+    # https://zensical.org/docs/setup/footer/#navigation
+    "navigation.footer",
+
+    # When section index pages are enabled, documents can be directly attached
+    # to sections, which is particularly useful for providing overview pages.
+    # https://zensical.org/docs/setup/navigation/#section-index-pages
+    "navigation.indexes",
+
+    # When instant navigation is enabled, clicks on all internal links will be
+    # intercepted and dispatched via XHR without fully reloading the page.
+    # https://zensical.org/docs/setup/navigation/#instant-navigation
+    "navigation.instant",
+
+    # With instant prefetching, your site will start to fetch a page once the
+    # user hovers over a link. This will reduce the perceived loading time
+    # for the user.
+    # https://zensical.org/docs/setup/navigation/#instant-prefetching
+    "navigation.instant.prefetch",
+
+    # When navigation paths are activated, a breadcrumb navigation is rendered
+    # above the title of each page
+    # https://zensical.org/docs/setup/navigation/#navigation-path
+    "navigation.path",
+
+    # When sections are enabled, top-level sections are rendered as groups in
+    # the sidebar for viewports above 1220px, but remain as-is on mobile.
+    # https://zensical.org/docs/setup/navigation/#navigation-sections
+    "navigation.sections",
+
+    # A back-to-top button can be shown when the user, after scrolling down,
+    # starts to scroll up again.
+    # https://zensical.org/docs/setup/navigation/#back-to-top-button
+    "navigation.top",
+
+    # When anchor tracking is enabled, the URL in the address bar is
+    # automatically updated with the active anchor as highlighted in the table
+    # of contents.
+    # https://zensical.org/docs/setup/navigation/#anchor-tracking
+    "navigation.tracking",
+
+    # When search highlighting is enabled and a user clicks on a search result,
+    # Zensical will highlight all occurrences after following the link.
+    # https://zensical.org/docs/setup/search/#search-highlighting
+    "search.highlight",
+
+    # When anchor following for the table of contents is enabled, the sidebar
+    # is automatically scrolled so that the active anchor is always visible.
+    # https://zensical.org/docs/setup/navigation/#anchor-following
+    # "toc.follow",
+]
+
+# ----------------------------------------------------------------------------
+# In the "palette" subsection you can configure options for the color scheme.
+# You can configure different color # schemes, e.g., to turn on dark mode,
+# that the user can switch between. Each color scheme can be further
+# customized.
+#
+# Read more:
+# - https://zensical.org/docs/setup/colors/
+# ----------------------------------------------------------------------------
+
+# Palette toggle for automatic mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+# Palette toggle for light mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+# Palette toggle for dark mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to system preference"
+
+# ----------------------------------------------------------------------------
+# In the "font" subsection you can configure the fonts used. By default, fonts
+# are loaded from Google Fonts, giving you a wide range of choices from a set
+# of suitably licensed fonts. There are options for a normal text font and for
+# a monospaced font used in code blocks.
+# ----------------------------------------------------------------------------
+#[project.theme.font]
+#text = "Inter"
+#code = "Jetbrains Mono"
+
+# ----------------------------------------------------------------------------
+# You can configure your own logo to be shown in the header using the "logo"
+# option in the "icons" subsection. The logo can be a path to a file in your
+# "docs_dir" or it can be a path to an icon.
+#
+# Likewise, you can customize the logo used for the repository section of the
+# header. Zensical derives the default logo for this from the repository URL.
+# See below...
+#
+# There are other icons you can customize. See the documentation for details.
+#
+# Read more:
+# - https://zensical.org/docs/setup/logo-and-icons
+# - https://zensical.org/docs/authoring/icons-emojis/#search
+# ----------------------------------------------------------------------------
+#[project.theme.icon]
+#logo = "lucide/smile"
+#repo = "lucide/smile"
+
+# ----------------------------------------------------------------------------
+# The "extra" section contains miscellaneous settings.
+# ----------------------------------------------------------------------------
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/jonathan343/spotify-sdk"
