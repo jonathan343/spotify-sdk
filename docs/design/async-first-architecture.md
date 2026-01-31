@@ -1,12 +1,3 @@
----
-title: Async-First Architecture with Unasync Code Generation
-status: implemented
-created: 2025-01-25
-implemented: 2025-01-28
-version: 0.2.0
-pr: "https://github.com/jonathan343/spotify-sdk/pull/21"
----
-
 # Async-First Architecture with Unasync Code Generation
 
 ## Motivation
