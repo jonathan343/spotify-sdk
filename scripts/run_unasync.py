@@ -113,6 +113,7 @@ def format_output(output_dir: Path) -> None:
 
 
 def run(check: bool = False) -> None:
+    """Generate sync code from async sources using unasync."""
     for rule_config in ALL_RULES:
         source_dir = ROOT_DIR / rule_config["fromdir"]
         committed_dir = ROOT_DIR / rule_config["todir"]

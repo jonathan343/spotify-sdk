@@ -1,3 +1,5 @@
+"""Common models shared across resources."""
+
 from typing import Generic, Literal, TypeVar
 
 from pydantic import Field

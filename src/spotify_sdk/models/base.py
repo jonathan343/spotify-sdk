@@ -1,3 +1,5 @@
+"""Base model configuration."""
+
 from pydantic import BaseModel, ConfigDict
 
 

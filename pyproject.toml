@@ -75,8 +75,23 @@ select = [
   # isort: Checks for un-sorted, un-formatted, and missing imports
   "I",
   # Checks for unused imports
-  "F401"
+  "F401",
+  # Enable all `pydocstyle` rules, limiting to those that adhere to the
+  # Google convention via `convention = "google"`, below.
+  "D",
 ]
+ignore = [
+  # Checks for public __init__ method definitions that are missing docstrings.
+  "D107" 
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
 
 [tool.ruff.format]
 docstring-code-format = true
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore all docstring rules (D) in the entire tests directory
+"tests/*" = ["D"]
