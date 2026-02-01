@@ -3,11 +3,15 @@
 [![PyPI version](https://img.shields.io/pypi/v/spotify-sdk.svg)](https://pypi.org/project/spotify-sdk/)
 [![Python versions](https://img.shields.io/pypi/pyversions/spotify-sdk.svg)](https://pypi.org/project/spotify-sdk/)
 [![Actions status](https://github.com/jonathan343/spotify-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/jonathan343/spotify-sdk/actions)
+[![Documentation](https://img.shields.io/badge/docs-spotify--sdk.dev-blue.svg)](https://spotify-sdk.dev/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 A Python SDK for the [Spotify Web API](https://developer.spotify.com/documentation/web-api).
 
-> **Note**: This is an independent, community-developed library and is not affiliated with or endorsed by Spotify.
+Full documentation is available at **[spotify-sdk.dev](https://spotify-sdk.dev/)**.
+
+> [!NOTE] 
+> This is an independent, community-developed library and is not affiliated with or endorsed by Spotify.
 
 ## Features
 
