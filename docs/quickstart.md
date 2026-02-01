@@ -78,8 +78,9 @@ asyncio.run(main())
 | Service | Description |
 |---------|-------------|
 | `client.albums` | Get albums, album tracks, and multiple albums |
-| `client.artists` | Get artists, artist albums, top tracks, and related artists |
-| `client.tracks` | Get tracks and audio features |
+| `client.artists` | Get artists, artist albums, and top tracks |
+| `client.playlists` | Get playlists, playlist items, and cover images |
+| `client.tracks` | Get tracks and multiple tracks |
 
 ## Configuration
 

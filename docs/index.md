@@ -39,6 +39,14 @@ icon: lucide/house
 
     [:octicons-arrow-right-24: Get started](quickstart.md)
 
+- __API Reference__
+
+    ---
+
+    Explore clients, services, and method signatures.
+
+    [:octicons-arrow-right-24: Reference](reference/index.md)
+
 - __Configuration__
 
     ---

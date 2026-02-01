@@ -49,7 +49,9 @@ codegen = [
   "unasync>=0.6.0",
 ]
 docs = [
-  "zensical>=0.0.19"
+  "zensical>=0.0.19",
+  "mkdocstrings-python>=1.10.0",
+  "griffe-pydantic>=1.1.0",
 ]
 dev = [
   {include-group = "lint"},
