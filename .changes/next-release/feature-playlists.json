@@ -1,0 +1,5 @@
+{
+  "type": "feature",
+  "category": "playlists",
+  "description": "Add `PlaylistService` (sync) and `AsyncPlaylistService` (async) with methods for fetching a playlist by ID, getting playlist items, listing the current user's playlists, listing a user's playlists, and getting playlist cover images. ([#31](https://github.com/jonathan343/spotify-sdk/pull/31))"
+}
