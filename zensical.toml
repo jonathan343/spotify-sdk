@@ -10,9 +10,9 @@ edit_uri = "edit/main/docs/"
 repo_name = "jonathan343/spotify-sdk"
 repo_url = "https://github.com/jonathan343/spotify-sdk"
 # TODO: Update site_url when publishing docs
+site_url = "https://spotify-sdk.dev/"
 
 # Copyright
-#site_url = "https://www.example.com/"
 copyright = """
 Copyright &copy; 2026 Jonathan Gaytan
 """
