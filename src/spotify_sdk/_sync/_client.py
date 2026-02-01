@@ -7,6 +7,7 @@ from typing import Any
 from ._base_client import BaseClient
 from .services.albums import AlbumService
 from .services.artists import ArtistService
+from .services.playlists import PlaylistService
 from .services.tracks import TrackService
 
 
@@ -36,6 +37,7 @@ class SpotifyClient:
         self.albums = AlbumService(self._base_client)
         self.tracks = TrackService(self._base_client)
         self.artists = ArtistService(self._base_client)
+        self.playlists = PlaylistService(self._base_client)
 
     def close(self) -> None:
         """Close the client and release resources."""

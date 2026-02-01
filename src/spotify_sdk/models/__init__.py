@@ -1,3 +1,5 @@
+"""Pydantic models for Spotify API responses."""
+
 from .album import Album, SimplifiedAlbum
 from .artist import Artist, SimplifiedArtist
 from .common import (
@@ -10,10 +12,19 @@ from .common import (
     Page,
     Restriction,
 )
+from .playlist import (
+    Playlist,
+    PlaylistTrack,
+    PlaylistTracksRef,
+    PublicUser,
+    SimplifiedPlaylist,
+)
 from .track import SimplifiedTrack, Track
 
 # Rebuild models that use forward references
 Album.model_rebuild()
+Playlist.model_rebuild()
+PlaylistTrack.model_rebuild()
 
 __all__ = [
     # Common
@@ -34,4 +45,10 @@ __all__ = [
     # Album
     "Album",
     "SimplifiedAlbum",
+    # Playlist
+    "Playlist",
+    "PlaylistTrack",
+    "PlaylistTracksRef",
+    "PublicUser",
+    "SimplifiedPlaylist",
 ]
