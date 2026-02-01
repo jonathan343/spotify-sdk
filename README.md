@@ -10,7 +10,8 @@ A Python SDK for the [Spotify Web API](https://developer.spotify.com/documentati
 
 Full documentation is available at **[spotify-sdk.dev](https://spotify-sdk.dev/)**.
 
-> **Note**: This is an independent, community-developed library and is not affiliated with or endorsed by Spotify.
+> [!NOTE] 
+> This is an independent, community-developed library and is not affiliated with or endorsed by Spotify.
 
 ## Features
 
