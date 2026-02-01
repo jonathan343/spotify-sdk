@@ -99,14 +99,14 @@ asyncio.run(main())
 
 ```python
 # Get a single album
-album = client.albums.get("album_id")
-album = client.albums.get("album_id", market="US")
+album = client.albums.get("<id>")
+album = client.albums.get("<id>", market="US")
 
 # Get multiple albums (up to 20)
-albums = client.albums.get_several(["album_id_1", "album_id_2"])
+albums = client.albums.get_several(["<id1>", "<id2>"])
 
 # Get album tracks with pagination
-tracks = client.albums.get_tracks("album_id", limit=10, offset=0)
+tracks = client.albums.get_tracks("<id>", limit=10, offset=0)
 ```
 
 ## Error Handling
@@ -179,7 +179,7 @@ Retries use exponential backoff with jitter:
 All API responses are returned as Pydantic models with full type hints:
 
 ```python
-album = client.albums.get("album_id")
+album = client.albums.get("<id>")
 
 # Access typed attributes
 print(album.name)           # str

@@ -87,7 +87,7 @@ TRACK_RESPONSE = {
 class TestAlbumServiceGet:
     def test_get_empty_id_raises_error(self):
         with SpotifyClient(access_token="test-token") as client:
-            with pytest.raises(ValueError, match="album_id cannot be empty"):
+            with pytest.raises(ValueError, match="id cannot be empty"):
                 client.albums.get("")
 
     def test_get_album(self, httpx_mock: HTTPXMock):
@@ -119,7 +119,7 @@ class TestAlbumServiceGet:
 class TestAlbumServiceGetSeveral:
     def test_get_several_empty_list_raises_error(self):
         with SpotifyClient(access_token="test-token") as client:
-            with pytest.raises(ValueError, match="album_ids cannot be empty"):
+            with pytest.raises(ValueError, match="ids cannot be empty"):
                 client.albums.get_several([])
 
     def test_get_several_albums(self, httpx_mock: HTTPXMock):
@@ -151,7 +151,7 @@ class TestAlbumServiceGetSeveral:
 class TestAlbumServiceGetTracks:
     def test_get_tracks_empty_id_raises_error(self):
         with SpotifyClient(access_token="test-token") as client:
-            with pytest.raises(ValueError, match="album_id cannot be empty"):
+            with pytest.raises(ValueError, match="id cannot be empty"):
                 client.albums.get_tracks("")
 
     def test_get_tracks(self, httpx_mock: HTTPXMock):

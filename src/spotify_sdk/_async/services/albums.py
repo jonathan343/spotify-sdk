@@ -9,34 +9,34 @@ from .._base_service import AsyncBaseService
 class AsyncAlbumService(AsyncBaseService):
     """Operations for Spotify albums."""
 
-    async def get(self, album_id: str, market: str | None = None) -> Album:
+    async def get(self, id: str, market: str | None = None) -> Album:
         """Get an album by ID.
 
         Args:
-            album_id: The Spotify ID for the album.
+            id: The Spotify ID for the album.
             market: An ISO 3166-1 alpha-2 country code for track relinking.
 
         Returns:
             The requested album.
 
         Raises:
-            ValueError: If album_id is empty.
+            ValueError: If id is empty.
         """
-        if not album_id:
-            raise ValueError("album_id cannot be empty")
+        if not id:
+            raise ValueError("id cannot be empty")
         params = {"market": market} if market else None
-        data = await self._get(f"/albums/{album_id}", params=params)
+        data = await self._get(f"/albums/{id}", params=params)
         return Album.model_validate(data)
 
     async def get_several(
         self,
-        album_ids: list[str],
+        ids: list[str],
         market: str | None = None,
     ) -> list[Album]:
         """Get multiple albums by IDs.
 
         Args:
-            album_ids: List of Spotify album IDs. The Spotify API enforces a
+            ids: List of Spotify album IDs. The Spotify API enforces a
                 maximum of 20 IDs per request.
             market: An ISO 3166-1 alpha-2 country code for track relinking.
 
@@ -44,11 +44,11 @@ class AsyncAlbumService(AsyncBaseService):
             List of albums.
 
         Raises:
-            ValueError: If album_ids is empty.
+            ValueError: If ids is empty.
         """
-        if not album_ids:
-            raise ValueError("album_ids cannot be empty")
-        params: dict[str, str] = {"ids": ",".join(album_ids)}
+        if not ids:
+            raise ValueError("ids cannot be empty")
+        params: dict[str, str] = {"ids": ",".join(ids)}
         if market:
             params["market"] = market
         data = await self._get("/albums", params=params)
@@ -56,7 +56,7 @@ class AsyncAlbumService(AsyncBaseService):
 
     async def get_tracks(
         self,
-        album_id: str,
+        id: str,
         market: str | None = None,
         limit: int = 20,
         offset: int = 0,
@@ -64,7 +64,7 @@ class AsyncAlbumService(AsyncBaseService):
         """Get an album's tracks.
 
         Args:
-            album_id: The Spotify ID for the album.
+            id: The Spotify ID for the album.
             market: An ISO 3166-1 alpha-2 country code for track relinking.
             limit: Maximum number of tracks to return (1-50, default 20).
             offset: Index of the first track to return.
@@ -73,12 +73,12 @@ class AsyncAlbumService(AsyncBaseService):
             Paginated list of tracks.
 
         Raises:
-            ValueError: If album_id is empty.
+            ValueError: If id is empty.
         """
-        if not album_id:
-            raise ValueError("album_id cannot be empty")
+        if not id:
+            raise ValueError("id cannot be empty")
         params = {"market": market, "limit": limit, "offset": offset}
-        data = await self._get(f"/albums/{album_id}/tracks", params=params)
+        data = await self._get(f"/albums/{id}/tracks", params=params)
         return Page[SimplifiedTrack].model_validate(data)
 
     async def get_new_releases(
