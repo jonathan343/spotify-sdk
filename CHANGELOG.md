@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.3.0
+
+### Breaking Changes
+* Renamed `album_id` and `track_id` parameters to `id`, and `album_ids` and `track_ids` to `ids` in `AlbumService` and `TrackService` methods for consistency with the Spotify API. ([#30](https://github.com/jonathan343/spotify-sdk/pull/30))
+
+### Features
+* Added `ArtistService` (sync) and `AsyncArtistService` (async) with methods for fetching an artist by ID, fetching multiple artists (up to 50), listing an artist's albums, and getting their top tracks. ([#25](https://github.com/jonathan343/spotify-sdk/pull/25))
+* Add `PlaylistService` (sync) and `AsyncPlaylistService` (async) with methods for fetching a playlist by ID, getting playlist items, listing the current user's playlists, listing a user's playlists, and getting playlist cover images. ([#31](https://github.com/jonathan343/spotify-sdk/pull/31))
+
+### Enhancements
+* Expose package version via `spotify_sdk.__version__`.
+* Enable pydocstyle linting with Google convention for consistent docstring formatting. ([#32](https://github.com/jonathan343/spotify-sdk/pull/32))
+
 ## v0.2.0
 
 ### Breaking Changes
