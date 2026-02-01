@@ -36,7 +36,7 @@ jobs:
         run: uv sync --group docs --no-default-groups
       
       - name: Build docs
-        run: zensical build --clean
+        run: uv run zensical build --clean
 
       - name: Setup Pages
         if: github.repository_owner == 'jonathan343'
