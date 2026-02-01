@@ -88,7 +88,7 @@ class TestAlbumServiceGet:
     @pytest.mark.anyio
     async def test_get_empty_id_raises_error(self):
         async with AsyncSpotifyClient(access_token="test-token") as client:
-            with pytest.raises(ValueError, match="album_id cannot be empty"):
+            with pytest.raises(ValueError, match="id cannot be empty"):
                 await client.albums.get("")
 
     @pytest.mark.anyio
@@ -123,7 +123,7 @@ class TestAlbumServiceGetSeveral:
     @pytest.mark.anyio
     async def test_get_several_empty_list_raises_error(self):
         async with AsyncSpotifyClient(access_token="test-token") as client:
-            with pytest.raises(ValueError, match="album_ids cannot be empty"):
+            with pytest.raises(ValueError, match="ids cannot be empty"):
                 await client.albums.get_several([])
 
     @pytest.mark.anyio
@@ -158,7 +158,7 @@ class TestAlbumServiceGetTracks:
     @pytest.mark.anyio
     async def test_get_tracks_empty_id_raises_error(self):
         async with AsyncSpotifyClient(access_token="test-token") as client:
-            with pytest.raises(ValueError, match="album_id cannot be empty"):
+            with pytest.raises(ValueError, match="id cannot be empty"):
                 await client.albums.get_tracks("")
 
     @pytest.mark.anyio
