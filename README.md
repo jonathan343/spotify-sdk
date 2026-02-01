@@ -3,6 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/spotify-sdk.svg)](https://pypi.org/project/spotify-sdk/)
 [![Python versions](https://img.shields.io/pypi/pyversions/spotify-sdk.svg)](https://pypi.org/project/spotify-sdk/)
 [![Actions status](https://github.com/jonathan343/spotify-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/jonathan343/spotify-sdk/actions)
+[![Documentation](https://img.shields.io/badge/docs-spotify--sdk.dev-blue.svg)](https://spotify-sdk.dev/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 A Python SDK for the [Spotify Web API](https://developer.spotify.com/documentation/web-api).
@@ -15,6 +16,10 @@ A Python SDK for the [Spotify Web API](https://developer.spotify.com/documentati
 - **Sync and async**: Dedicated `SpotifyClient` and `AsyncSpotifyClient` classes
 - **Automatic retries**: Exponential backoff with jitter for rate limits and transient errors
 - **Context managers**: Clean resource management with `with` and `async with` support
+
+## Documentation
+
+Full documentation is available at **[spotify-sdk.dev](https://spotify-sdk.dev/)**.
 
 ## Installation
 
