@@ -48,11 +48,15 @@ codegen = [
   {include-group = "lint"},
   "unasync>=0.6.0",
 ]
+docs = [
+  "zensical>=0.0.19"
+]
 dev = [
   {include-group = "lint"},
   {include-group = "test"},
   {include-group = "typecheck"},
   {include-group = "codegen"},
+  {include-group = "docs"},
   "jmeslog>=0.2.0",
 ]
 

@@ -6,5 +6,8 @@ dist/
 wheels/
 *.egg-info
 
+# Zensical
+site/
+
 # Virtual environments
 .venv
