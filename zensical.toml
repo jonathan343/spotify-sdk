@@ -11,6 +11,29 @@ repo_name = "jonathan343/spotify-sdk"
 repo_url = "https://github.com/jonathan343/spotify-sdk"
 # TODO: Update site_url when publishing docs
 site_url = "https://spotify-sdk.dev/"
+nav = [
+    {"Welcome" = "index.md"},
+    {"Installation" = "installation.md"},
+    {"Quickstart" = "quickstart.md"},
+    {"Reference" = [
+        "reference/index.md",
+        "reference/clients.md",
+        "reference/models.md",
+        {"Services" = [
+            "reference/services/index.md",
+            "reference/services/albums.md",
+            "reference/services/artists.md",
+            "reference/services/playlists.md",
+            "reference/services/tracks.md",
+        ]},
+    ]},
+    {"Design" = [
+        "design/index.md",
+        {"Architecture" = [
+            "design/async-first-architecture.md",
+        ]},
+    ]},
+]
 
 # Copyright
 copyright = """
@@ -78,7 +101,7 @@ features = [
     # Turn on this feature to expand all collapsible sections in the
     # navigation sidebar by default.
     # https://zensical.org/docs/setup/navigation/#navigation-expansion
-    # "navigation.expand",
+    "navigation.expand",
 
     # This feature turns on navigation elements in the footer that allow the
     # user to navigate to a next or previous page.
@@ -230,3 +253,18 @@ anchor_linenums = true
 # Required for content tabs
 [project.markdown_extensions.pymdownx.tabbed]
 alternate_style = true
+
+# ----------------------------------------------------------------------------
+# mkdocstrings for API reference rendering
+# ----------------------------------------------------------------------------
+[project.plugins.mkdocstrings.handlers.python]
+inventories = ["https://docs.python.org/3/objects.inv"]
+paths = ["src"]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "google"
+inherited_members = true
+show_source = false
+extensions = [
+    { griffe_pydantic = { schema = true } }
+]
