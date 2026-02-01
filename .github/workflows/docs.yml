@@ -1,0 +1,46 @@
+name: Documentation
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy spotify-sdk documentation to GitHub Pages
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
+      
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b # v7
+        with:
+          python-version-file: .python-version
+
+      - name: Install docs dependencies 
+        run: uv sync --group docs --no-default-groups
+      
+      - name: Build docs
+        run: zensical build --clean
+
+      - name: Setup Pages
+        if: github.repository_owner == 'jonathan343'
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b #v4
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        if: github.repository_owner == 'jonathan343'
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e #v4
