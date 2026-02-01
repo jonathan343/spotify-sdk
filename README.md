@@ -8,6 +8,8 @@
 
 A Python SDK for the [Spotify Web API](https://developer.spotify.com/documentation/web-api).
 
+Full documentation is available at **[spotify-sdk.dev](https://spotify-sdk.dev/)**.
+
 > **Note**: This is an independent, community-developed library and is not affiliated with or endorsed by Spotify.
 
 ## Features
@@ -16,10 +18,6 @@ A Python SDK for the [Spotify Web API](https://developer.spotify.com/documentati
 - **Sync and async**: Dedicated `SpotifyClient` and `AsyncSpotifyClient` classes
 - **Automatic retries**: Exponential backoff with jitter for rate limits and transient errors
 - **Context managers**: Clean resource management with `with` and `async with` support
-
-## Documentation
-
-Full documentation is available at **[spotify-sdk.dev](https://spotify-sdk.dev/)**.
 
 ## Installation
 
