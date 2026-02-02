@@ -14,7 +14,10 @@ Both clients accept the same constructor arguments.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `access_token` | `str` | required | Spotify access token |
+| `access_token` | `str` | optional | Spotify access token (mutually exclusive with other auth inputs) |
+| `client_id` | `str` | optional | Spotify client ID (client credentials flow) |
+| `client_secret` | `str` | optional | Spotify client secret (client credentials flow) |
+| `auth_provider` | `AuthProvider` | optional | Custom auth provider (mutually exclusive with other auth inputs) |
 | `timeout` | `float` | `30.0` | Request timeout in seconds |
 | `max_retries` | `int` | `3` | Maximum retries for transient errors |
 
@@ -41,6 +44,71 @@ Both clients accept the same constructor arguments.
         max_retries=3,
     )
     ```
+
+### Client Credentials
+
+Use client credentials to let the SDK obtain and refresh tokens automatically.
+
+=== "Sync"
+
+    ```python
+    from spotify_sdk import SpotifyClient
+
+    client = SpotifyClient.from_client_credentials(
+        client_id="your-client-id",
+        client_secret="your-client-secret",
+    )
+    ```
+
+=== "Async"
+
+    ```python
+    from spotify_sdk import AsyncSpotifyClient
+
+    client = AsyncSpotifyClient.from_client_credentials(
+        client_id="your-client-id",
+        client_secret="your-client-secret",
+    )
+    ```
+
+### Custom Auth Provider
+
+Pass a custom auth provider instance for advanced or future flows.
+
+=== "Sync"
+
+    ```python
+    from spotify_sdk import SpotifyClient
+    from spotify_sdk.auth import ClientCredentials
+
+    auth = ClientCredentials(
+        client_id="your-client-id",
+        client_secret="your-client-secret",
+    )
+    client = SpotifyClient(auth_provider=auth)
+    ```
+
+=== "Async"
+
+    ```python
+    from spotify_sdk import AsyncSpotifyClient
+    from spotify_sdk.auth import AsyncClientCredentials
+
+    auth = AsyncClientCredentials(
+        client_id="your-client-id",
+        client_secret="your-client-secret",
+    )
+    client = AsyncSpotifyClient(auth_provider=auth)
+    ```
+
+### Environment Variables
+
+If `client_id` or `client_secret` are omitted, the SDK reads:
+
+- `SPOTIFY_SDK_CLIENT_ID`
+- `SPOTIFY_SDK_CLIENT_SECRET`
+
+Explicit arguments override environment variables.
 
 ## Lifecycle
 

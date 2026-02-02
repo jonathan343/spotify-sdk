@@ -17,6 +17,17 @@ from spotify_sdk import (
 from spotify_sdk._sync._base_client import BaseClient
 
 
+class _StaticAuthProvider:
+    def __init__(self, token: str) -> None:
+        self._token = token
+
+    def get_access_token(self) -> str:
+        return self._token
+
+    def close(self) -> None:
+        return None
+
+
 class TestBaseClientInit:
     def test_default_values(self):
         client = BaseClient(access_token="test-token")
@@ -33,12 +44,23 @@ class TestBaseClientInit:
         assert client._timeout == 60.0
         assert client._max_retries == 5
 
+    def test_missing_auth_raises(self):
+        with pytest.raises(ValueError):
+            BaseClient()
+
+    def test_multiple_auth_inputs_raises(self):
+        with pytest.raises(ValueError):
+            BaseClient(
+                access_token="test-token",
+                auth_provider=_StaticAuthProvider("token"),
+            )
+
 
 class TestBaseClientHeaders:
     def test_default_headers(self):
         client = BaseClient(access_token="test-token")
-        headers = client._default_headers()
-        assert headers["Authorization"] == "Bearer test-token"
+        headers = client._default_headers("override-token")
+        assert headers["Authorization"] == "Bearer override-token"
         assert headers["Content-Type"] == "application/json"
 
 
@@ -53,6 +75,20 @@ class TestBaseClientRequest:
         result = client.request("GET", "/albums/123")
 
         assert result == {"id": "123", "name": "Test Album"}
+        client.close()
+
+    def test_auth_provider_header(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(
+            url="https://api.spotify.com/v1/albums/123",
+            json={"id": "123"},
+        )
+
+        client = BaseClient(auth_provider=_StaticAuthProvider("dynamic-token"))
+        client.request("GET", "/albums/123")
+
+        requests = httpx_mock.get_requests()
+        assert len(requests) == 1
+        assert requests[0].headers["Authorization"] == "Bearer dynamic-token"
         client.close()
 
     def test_successful_post_request(self, httpx_mock: HTTPXMock):

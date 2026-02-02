@@ -1,6 +1,9 @@
 """Tests for the Spotify client."""
 
+import pytest
+
 from spotify_sdk import SpotifyClient
+from spotify_sdk._sync.auth import ClientCredentials
 from spotify_sdk._sync.services.albums import AlbumService
 
 
@@ -24,6 +27,35 @@ class TestSpotifyClientInit:
         client = SpotifyClient(access_token="test-token")
         assert hasattr(client, "albums")
         assert isinstance(client.albums, AlbumService)
+
+    def test_auth_provider(self):
+        auth_provider = ClientCredentials(
+            client_id="client-id",
+            client_secret="client-secret",
+        )
+        client = SpotifyClient(auth_provider=auth_provider)
+        assert client._base_client._auth_provider is auth_provider
+
+    def test_missing_auth_raises(self):
+        with pytest.raises(ValueError):
+            SpotifyClient()
+
+    def test_invalid_auth_combinations(self):
+        with pytest.raises(ValueError):
+            SpotifyClient(
+                access_token="token",
+                client_id="client-id",
+                client_secret="client-secret",
+            )
+
+        with pytest.raises(ValueError):
+            SpotifyClient(
+                access_token="token",
+                auth_provider=ClientCredentials(
+                    client_id="client-id",
+                    client_secret="client-secret",
+                ),
+            )
 
 
 class TestSpotifyClientContextManager:

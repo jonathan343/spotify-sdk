@@ -20,6 +20,14 @@ reference is grouped by service with code tabs for the sync and async styles.
 
     [:octicons-arrow-right-24: Clients](clients.md)
 
+- __Auth__
+
+    ---
+
+    Client credentials and auth provider utilities.
+
+    [:octicons-arrow-right-24: Auth](auth.md)
+
 - __Services__
 
     ---
