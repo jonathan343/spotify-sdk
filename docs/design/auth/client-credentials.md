@@ -1,9 +1,5 @@
 # Client Credentials Authentication
 
-## Status
-
-Draft.
-
 ## Context
 
 Today, `SpotifyClient` and `AsyncSpotifyClient` require callers to supply an
