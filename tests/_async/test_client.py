@@ -3,6 +3,7 @@
 import pytest
 
 from spotify_sdk import AsyncSpotifyClient
+from spotify_sdk._async.auth import AsyncClientCredentials
 from spotify_sdk._async.services.albums import AsyncAlbumService
 
 
@@ -26,6 +27,35 @@ class TestSpotifyClientInit:
         client = AsyncSpotifyClient(access_token="test-token")
         assert hasattr(client, "albums")
         assert isinstance(client.albums, AsyncAlbumService)
+
+    def test_auth_provider(self):
+        auth_provider = AsyncClientCredentials(
+            client_id="client-id",
+            client_secret="client-secret",
+        )
+        client = AsyncSpotifyClient(auth_provider=auth_provider)
+        assert client._base_client._auth_provider is auth_provider
+
+    def test_missing_auth_raises(self):
+        with pytest.raises(ValueError):
+            AsyncSpotifyClient()
+
+    def test_invalid_auth_combinations(self):
+        with pytest.raises(ValueError):
+            AsyncSpotifyClient(
+                access_token="token",
+                client_id="client-id",
+                client_secret="client-secret",
+            )
+
+        with pytest.raises(ValueError):
+            AsyncSpotifyClient(
+                access_token="token",
+                auth_provider=AsyncClientCredentials(
+                    client_id="client-id",
+                    client_secret="client-secret",
+                ),
+            )
 
 
 class TestSpotifyClientContextManager:
