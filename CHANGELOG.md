@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.0
+
+### Features
+* Add support for Spotify's [Client Credentials Flow](https://developer.spotify.com/documentation/web-api/tutorials/client-credentials-flow) with public auth helpers, token caching, and env var support. ([#36](https://github.com/jonathan343/spotify-sdk/pull/36))
+
+### Documentation
+* Document client credentials usage, auth helpers, env vars, and limitations across quickstart, client reference, and a new auth reference page. ([#36](https://github.com/jonathan343/spotify-sdk/pull/36))
+
 ## v0.3.0
 
 ### Breaking Changes

@@ -1,5 +1,0 @@
-{
-  "type": "documentation",
-  "category": "auth",
-  "description": "Document client credentials usage, auth helpers, env vars, and limitations across quickstart, client reference, and a new auth reference page. ([#36](https://github.com/jonathan343/spotify-sdk/pull/36))"
-}
