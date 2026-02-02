@@ -1,0 +1,5 @@
+{
+  "type": "documentation",
+  "category": "audiobooks",
+  "description": "Add documentation for the new audiobooks service. ([#38](https://github.com/jonathan343/spotify-sdk/pull/38)"
+}
