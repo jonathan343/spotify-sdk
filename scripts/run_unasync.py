@@ -15,6 +15,8 @@ ADDITIONAL_REPLACEMENTS = {
     "AsyncSpotifyClient": "SpotifyClient",
     "AsyncBaseClient": "BaseClient",
     "AsyncBaseService": "BaseService",
+    "AsyncAuthProvider": "AuthProvider",
+    "AsyncClientCredentials": "ClientCredentials",
     "AsyncAlbumService": "AlbumService",
     "AsyncTrackService": "TrackService",
     "AsyncArtistService": "ArtistService",
@@ -22,6 +24,7 @@ ADDITIONAL_REPLACEMENTS = {
     # Override unasync default Async→Sync prefix to get httpx.Client
     # (not httpx.SyncClient).
     "AsyncClient": "Client",
+    "anyio.Lock": "threading.Lock",
     "aclose": "close",
     "_async": "_sync",
 }
@@ -55,6 +58,8 @@ POST_PROCESS_PATTERNS = [
     (re.compile(r"^import anyio\n", re.MULTILINE), ""),
     # Replace anyio.sleep with time.sleep.
     (re.compile(r"anyio\.sleep"), "time.sleep"),
+    # Replace anyio.Lock with threading.Lock.
+    (re.compile(r"anyio\.Lock"), "threading.Lock"),
     # Remove @pytest.mark.anyio decorator lines (and trailing newline).
     (re.compile(r"^\s*@pytest\.mark\.anyio\n", re.MULTILINE), ""),
     # Replace patched anyio.sleep in test decorators.
@@ -95,6 +100,17 @@ def post_process(output_dir: Path) -> None:
                 )
                 if "import time" not in content:
                     content = "import time\n" + content
+            if (
+                "threading.Lock" in content
+                and "import threading" not in content
+            ):
+                content = re.sub(
+                    r"(from __future__ import annotations\n)",
+                    r"\1\nimport threading\n",
+                    content,
+                )
+                if "import threading" not in content:
+                    content = "import threading\n" + content
             filepath.write_text(content)
 
 

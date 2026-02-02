@@ -17,6 +17,7 @@ from ..exceptions import (
     ServerError,
     SpotifyError,
 )
+from .auth import AsyncAuthProvider
 
 
 class AsyncBaseClient:
@@ -32,7 +33,8 @@ class AsyncBaseClient:
 
     def __init__(
         self,
-        access_token: str,
+        access_token: str | None = None,
+        auth_provider: AsyncAuthProvider | None = None,
         timeout: float = 30.0,
         max_retries: int | None = None,
     ) -> None:
@@ -40,10 +42,21 @@ class AsyncBaseClient:
 
         Args:
             access_token: Spotify API access token.
+            auth_provider: Auth provider for dynamic access tokens.
             timeout: Default request timeout in seconds.
             max_retries: Maximum number of retries for failed requests.
         """
+        if access_token and auth_provider:
+            raise ValueError(
+                "Provide only one of access_token or auth_provider."
+            )
+        if not access_token and not auth_provider:
+            raise ValueError(
+                "Either access_token or auth_provider must be provided."
+            )
+
         self._access_token = access_token
+        self._auth_provider = auth_provider
         self._timeout = timeout
         self._max_retries = (
             max_retries if max_retries is not None else self.MAX_RETRIES
@@ -57,16 +70,22 @@ class AsyncBaseClient:
             self._client = httpx.AsyncClient(
                 base_url=self.BASE_URL,
                 timeout=self._timeout,
-                headers=self._default_headers(),
             )
         return self._client
 
-    def _default_headers(self) -> dict[str, str]:
+    def _default_headers(self, access_token: str) -> dict[str, str]:
         """Return default headers for all requests."""
         return {
-            "Authorization": f"Bearer {self._access_token}",
+            "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json",
         }
+
+    async def _get_access_token(self) -> str:
+        if self._access_token:
+            return self._access_token
+        if self._auth_provider:
+            return await self._auth_provider.get_access_token()
+        raise SpotifyError("No access token available.")
 
     async def request(
         self,
@@ -98,12 +117,14 @@ class AsyncBaseClient:
 
         for attempt in range(retries + 1):
             try:
+                access_token = await self._get_access_token()
                 response = await self._http_client.request(
                     method=method,
                     url=path,
                     params=self._clean_params(params),
                     json=json,
                     timeout=timeout,
+                    headers=self._default_headers(access_token),
                 )
                 return self._handle_response(response)
 
@@ -202,6 +223,8 @@ class AsyncBaseClient:
         if self._client is not None:
             await self._client.aclose()
             self._client = None
+        if self._auth_provider and hasattr(self._auth_provider, "close"):
+            await self._auth_provider.close()
 
     async def __aenter__(self) -> "AsyncBaseClient":
         return self
