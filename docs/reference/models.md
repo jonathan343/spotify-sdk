@@ -18,6 +18,13 @@ They are shared by sync and async clients.
         members: true
         show_if_no_docstring: true
 
+## Audiobook models
+
+::: spotify_sdk.models.audiobook
+    options:
+        members: true
+        show_if_no_docstring: true
+
 ## Artist models
 
 ::: spotify_sdk.models.artist

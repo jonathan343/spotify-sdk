@@ -23,6 +23,7 @@ nav = [
         {"Services" = [
             "reference/services/index.md",
             "reference/services/albums.md",
+            "reference/services/audiobooks.md",
             "reference/services/artists.md",
             "reference/services/playlists.md",
             "reference/services/tracks.md",

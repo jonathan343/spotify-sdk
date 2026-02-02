@@ -38,6 +38,7 @@ attributes on the client instance.
 | Service | Description |
 | --- | --- |
 | [Albums](albums.md) | Album details, tracks, and new releases |
+| [Audiobooks](audiobooks.md) | Audiobook details and chapter lookups |
 | [Artists](artists.md) | Artist profiles, albums, and top tracks |
 | [Playlists](playlists.md) | Playlist details, items, and images |
 | [Tracks](tracks.md) | Track details and bulk lookups |

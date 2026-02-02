@@ -109,6 +109,20 @@ albums = client.albums.get_several(["<id1>", "<id2>"])
 tracks = client.albums.get_tracks("<id>", limit=10, offset=0)
 ```
 
+### Audiobooks
+
+```python
+# Get a single audiobook
+audiobook = client.audiobooks.get("<id>")
+audiobook = client.audiobooks.get("<id>", market="US")
+
+# Get multiple audiobooks (up to 50)
+audiobooks = client.audiobooks.get_several(["<id1>", "<id2>"])
+
+# Get audiobook chapters with pagination
+chapters = client.audiobooks.get_chapters("<id>", limit=10, offset=0)
+```
+
 ## Error Handling
 
 The SDK raises specific exceptions for different error types:
