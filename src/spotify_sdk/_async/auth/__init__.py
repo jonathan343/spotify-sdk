@@ -59,9 +59,11 @@ class AsyncAuthProvider(Protocol):
 
     async def get_access_token(self) -> str:
         """Return a valid access token (refreshing if needed)."""
+        ...
 
     async def close(self) -> None:
         """Optional cleanup hook (default no-op)."""
+        ...
 
 
 class AsyncClientCredentials:
