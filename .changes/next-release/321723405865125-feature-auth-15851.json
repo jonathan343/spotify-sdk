@@ -1,5 +1,0 @@
-{
-  "type": "feature",
-  "category": "auth",
-  "description": "Add support for Spotify's [Client Credentials Flow](https://developer.spotify.com/documentation/web-api/tutorials/client-credentials-flow) with public auth helpers, token caching, and env var support. ([#36](https://github.com/jonathan343/spotify-sdk/pull/36))"
-}

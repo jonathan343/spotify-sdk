@@ -1,7 +1,7 @@
 # Changelog
 {% for release, changes in releases %}
 ## v{{ release }}
-{%- for type_name in ['breaking', 'feature', 'enhancement', 'bugfix', 'dependency'] %}
+{%- for type_name in ['breaking', 'feature', 'enhancement', 'bugfix', 'dependency', 'documentation'] %}
 {%- for change in changes.changes if change.type == type_name %}
 {%- if loop.first %}
 {%- if type_name == 'breaking' %}
@@ -19,6 +19,9 @@
 {%- elif type_name == 'dependency' %}
 
 ### Dependencies
+{%- elif type_name == 'documentation' %}
+
+### Documentation
 {%- endif %}
 {%- endif %}
 * {{ change.description }}
