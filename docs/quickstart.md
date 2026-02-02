@@ -8,10 +8,13 @@ This guide covers the basics of using the Spotify SDK.
 
 ## Authentication
 
-The SDK uses [access token](https://developer.spotify.com/documentation/web-api/concepts/access-token) authentication. You'll need to obtain an access token through Spotify's authorization flows before using the SDK.
+The SDK supports access tokens and the client credentials flow. You can supply
+an access token directly or let the SDK obtain and refresh tokens for you.
 
-!!! tip "Getting an Access Token"
-    Visit the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) to create an app and obtain credentials. Use Spotify's authorization flows (Authorization Code, Client Credentials, etc.) to get an access token.
+!!! tip "Getting credentials"
+    Visit the Spotify Developer Dashboard to create an app and obtain a client
+    ID and client secret. Use Spotify's authorization flows to get user tokens
+    when accessing `/me/*` endpoints.
 
 ## Basic Usage
 
@@ -93,6 +96,26 @@ client = SpotifyClient(
     max_retries=3,     # Maximum retry attempts (default: 3)
 )
 ```
+
+### Client Credentials
+
+Create clients using client credentials (server-to-server).
+
+```python
+from spotify_sdk import SpotifyClient
+
+client = SpotifyClient.from_client_credentials(
+    client_id="your-client-id",
+    client_secret="your-client-secret",
+)
+```
+
+### Environment Variables
+
+If you omit `client_id` or `client_secret`, the SDK reads:
+
+- `SPOTIFY_SDK_CLIENT_ID`
+- `SPOTIFY_SDK_CLIENT_SECRET`
 
 ### Retry Behavior
 

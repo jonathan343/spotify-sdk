@@ -55,6 +55,14 @@ icon: lucide/house
 
     [:octicons-arrow-right-24: Configure](quickstart.md#configuration)
 
+- __Auth__
+
+    ---
+
+    Client credentials, custom providers, and token caching.
+
+    [:octicons-arrow-right-24: Auth](reference/auth.md)
+
 - __Error Handling__
 
     ---
