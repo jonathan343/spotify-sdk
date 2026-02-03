@@ -2,6 +2,14 @@
 
 from .album import Album, SimplifiedAlbum
 from .artist import Artist, SimplifiedArtist
+from .audiobook import (
+    Audiobook,
+    AudiobookAuthor,
+    AudiobookNarrator,
+    ResumePoint,
+    SimplifiedAudiobook,
+    SimplifiedChapter,
+)
 from .common import (
     Copyright,
     ExternalIds,
@@ -45,6 +53,13 @@ __all__ = [
     # Album
     "Album",
     "SimplifiedAlbum",
+    # Audiobook
+    "Audiobook",
+    "AudiobookAuthor",
+    "AudiobookNarrator",
+    "ResumePoint",
+    "SimplifiedAudiobook",
+    "SimplifiedChapter",
     # Playlist
     "Playlist",
     "PlaylistTrack",

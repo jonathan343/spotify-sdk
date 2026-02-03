@@ -1,0 +1,5 @@
+{
+  "type": "feature",
+  "category": "audiobooks",
+  "description": "Add audiobook models and services (sync + async), including chapter pagination support and tests. ([#38](https://github.com/jonathan343/spotify-sdk/pull/38))"
+}
