@@ -22,6 +22,7 @@ ADDITIONAL_REPLACEMENTS = {
     "AsyncArtistService": "ArtistService",
     "AsyncPlaylistService": "PlaylistService",
     "AsyncChapterService": "ChapterService",
+    "AsyncAudiobookService": "AudiobookService",
     # Override unasync default Async→Sync prefix to get httpx.Client
     # (not httpx.SyncClient).
     "AsyncClient": "Client",
