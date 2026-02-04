@@ -26,6 +26,12 @@ uv run zensical build --clean       # Build docs site
 - Keep private attributes prefixed with `_`.
 - For reserved keywords, use `type_` with `Field(alias="type")`.
 - Prefer updating `_async` code and regenerating `_sync` via `unasync`.
+- When adding any `Async*` classes, update `scripts/run_unasync.py` to map
+  `AsyncX` to `X` so sync code does not keep the `Async` prefix.
+- When adding new docs pages, update `zensical.toml` nav so the page appears
+  in the built site.
+- Use clearly fake placeholder IDs in docs examples to avoid implying they are
+  real, valid Spotify IDs.
 
 ## Testing Guidelines
 - Frameworks: `pytest`, `pytest-httpx`, `anyio`.
