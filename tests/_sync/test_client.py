@@ -5,7 +5,7 @@ import pytest
 from spotify_sdk import SpotifyClient
 from spotify_sdk._sync.auth import ClientCredentials
 from spotify_sdk._sync.services.albums import AlbumService
-from spotify_sdk._sync.services.audiobooks import SyncAudiobookService
+from spotify_sdk._sync.services.audiobooks import AudiobookService
 
 
 class TestSpotifyClientInit:
@@ -32,7 +32,7 @@ class TestSpotifyClientInit:
     def test_has_audiobooks_service(self):
         client = SpotifyClient(access_token="test-token")
         assert hasattr(client, "audiobooks")
-        assert isinstance(client.audiobooks, SyncAudiobookService)
+        assert isinstance(client.audiobooks, AudiobookService)
 
     def test_auth_provider(self):
         auth_provider = ClientCredentials(

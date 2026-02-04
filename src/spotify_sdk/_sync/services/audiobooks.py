@@ -6,7 +6,7 @@ from ...models import Audiobook, Page, SimplifiedChapter
 from .._base_service import BaseService
 
 
-class SyncAudiobookService(BaseService):
+class AudiobookService(BaseService):
     """Operations for Spotify audiobooks."""
 
     def get(self, id: str, market: str | None = None) -> Audiobook:
