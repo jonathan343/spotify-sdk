@@ -1,0 +1,25 @@
+{
+  "schema-version": "0.2",
+  "changes": [
+    {
+      "type": "feature",
+      "category": "audiobooks",
+      "description": "Add audiobook models and services (sync + async), including chapter pagination support and tests. ([#38](https://github.com/jonathan343/spotify-sdk/pull/38))"
+    },
+    {
+      "type": "documentation",
+      "category": "audiobooks",
+      "description": "Add documentation for the new audiobooks service. ([#38](https://github.com/jonathan343/spotify-sdk/pull/38))"
+    },
+    {
+      "type": "feature",
+      "category": "chapters",
+      "description": "Add chapter support with new Chapter model and chapter service methods for getting a chapter and fetching multiple chapters. ([#39](https://github.com/jonathan343/spotify-sdk/pull/39))"
+    },
+    {
+      "type": "documentation",
+      "category": "chapters",
+      "description": "Add documentation for the new chapters service. ([#39](https://github.com/jonathan343/spotify-sdk/pull/39))"
+    }
+  ]
+}
