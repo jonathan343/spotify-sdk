@@ -67,8 +67,8 @@ class SpotifyClient:
 
         # Initialize services
         self.albums = AlbumService(self._base_client)
-        self.chapters = ChapterService(self._base_client)
         self.audiobooks = AudiobookService(self._base_client)
+        self.chapters = ChapterService(self._base_client)
         self.tracks = TrackService(self._base_client)
         self.artists = ArtistService(self._base_client)
         self.playlists = PlaylistService(self._base_client)
