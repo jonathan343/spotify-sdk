@@ -65,6 +65,8 @@ jobs:
         run: uv sync --group codegen
       - name: Check sync code is up to date
         run: uv run python scripts/run_unasync.py --check
+      - name: Check for Sync-prefixed classes
+        run: uv run python scripts/check_no_sync_prefix.py
 
   test:
     runs-on: ubuntu-latest
