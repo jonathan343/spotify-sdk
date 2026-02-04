@@ -25,7 +25,7 @@ class SimplifiedTrack(SpotifyModel):
     linked_from: LinkedFrom | None = None
     restrictions: Restriction | None = None
     name: str
-    preview_url: str | None
+    preview_url: str | None = None
     track_number: int
     type_: Literal["track"] = Field(alias="type")
     uri: str
