@@ -42,7 +42,7 @@ CHAPTER_RESPONSE = {
     "html_description": "<p>Chapter description.</p>",
     "duration_ms": 600000,
     "explicit": False,
-    "external_urls": {"spotify": "https://open.spotify.com/episode/456"},
+    "external_urls": {"spotify": "https://open.spotify.com/chapter/456"},
     "href": "https://api.spotify.com/v1/chapters/456",
     "id": "456",
     "images": [
