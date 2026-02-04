@@ -9,6 +9,7 @@ from .auth import AuthProvider, ClientCredentials
 from .services.albums import AlbumService
 from .services.artists import ArtistService
 from .services.audiobooks import SyncAudiobookService
+from .services.chapters import ChapterService
 from .services.playlists import PlaylistService
 from .services.tracks import TrackService
 
@@ -67,6 +68,7 @@ class SpotifyClient:
         # Initialize services
         self.albums = AlbumService(self._base_client)
         self.audiobooks = SyncAudiobookService(self._base_client)
+        self.chapters = ChapterService(self._base_client)
         self.tracks = TrackService(self._base_client)
         self.artists = ArtistService(self._base_client)
         self.playlists = PlaylistService(self._base_client)
