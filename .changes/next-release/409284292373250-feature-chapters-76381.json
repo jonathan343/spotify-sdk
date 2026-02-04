@@ -1,5 +1,0 @@
-{
-  "type": "feature",
-  "category": "chapters",
-  "description": "Add chapter support with new Chapter model and chapter service methods for getting a chapter and fetching multiple chapters. ([#39](https://github.com/jonathan343/spotify-sdk/pull/39))"
-}

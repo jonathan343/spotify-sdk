@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.0
+
+### Features
+* Add audiobook models and services (sync + async), including chapter pagination support and tests. ([#38](https://github.com/jonathan343/spotify-sdk/pull/38))
+* Add chapter support with new Chapter model and chapter service methods for getting a chapter and fetching multiple chapters. ([#39](https://github.com/jonathan343/spotify-sdk/pull/39))
+
+### Documentation
+* Add documentation for the new audiobooks service. ([#38](https://github.com/jonathan343/spotify-sdk/pull/38))
+* Add documentation for the new chapters service. ([#39](https://github.com/jonathan343/spotify-sdk/pull/39))
+
 ## v0.4.0
 
 ### Features
