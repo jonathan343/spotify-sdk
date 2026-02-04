@@ -56,7 +56,7 @@ class SimplifiedAudiobook(SpotifyModel):
 class SimplifiedChapter(SpotifyModel):
     """Basic chapter info embedded in other objects."""
 
-    audio_preview_url: str | None
+    audio_preview_url: str | None = None
     available_markets: list[str] | None = None
     chapter_number: int
     description: str
@@ -82,3 +82,9 @@ class Audiobook(SimplifiedAudiobook):
     """Complete audiobook with chapter list."""
 
     chapters: Page[SimplifiedChapter]
+
+
+class Chapter(SimplifiedChapter):
+    """Complete chapter with audiobook info."""
+
+    audiobook: SimplifiedAudiobook
