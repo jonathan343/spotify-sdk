@@ -15,6 +15,7 @@ nav = [
     {"Welcome" = "index.md"},
     {"Installation" = "installation.md"},
     {"Quickstart" = "quickstart.md"},
+    {"Changelog" = "changelog.md"},
     {"Reference" = [
         "reference/index.md",
         "reference/clients.md",
@@ -259,6 +260,9 @@ anchor_linenums = true
 # Required for content tabs
 [project.markdown_extensions.pymdownx.tabbed]
 alternate_style = true
+
+# Snippets: embed content from arbitrary files via simple syntax.
+[project.markdown_extensions.pymdownx.snippets]
 
 # ----------------------------------------------------------------------------
 # mkdocstrings for API reference rendering
