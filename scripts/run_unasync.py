@@ -17,6 +17,7 @@ ADDITIONAL_REPLACEMENTS = {
     "AsyncBaseService": "BaseService",
     "AsyncAuthProvider": "AuthProvider",
     "AsyncClientCredentials": "ClientCredentials",
+    "AsyncAuthorizationCode": "AuthorizationCode",
     "AsyncAlbumService": "AlbumService",
     "AsyncTrackService": "TrackService",
     "AsyncArtistService": "ArtistService",
@@ -124,7 +125,7 @@ def format_output(output_dir: Path) -> None:
         capture_output=True,
     )
     subprocess.run(
-        ["ruff", "format", str(output_dir)],
+        ["ruff", "format", "--preview", str(output_dir)],
         check=True,
         capture_output=True,
     )
