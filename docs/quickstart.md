@@ -8,8 +8,9 @@ This guide covers the basics of using the Spotify SDK.
 
 ## Authentication
 
-The SDK supports access tokens and the client credentials flow. You can supply
-an access token directly or let the SDK obtain and refresh tokens for you.
+The SDK supports access tokens, client credentials, and authorization code
+auth. You can supply an access token directly or let the SDK obtain and
+refresh tokens for you.
 
 !!! tip "Getting credentials"
     Visit the Spotify Developer Dashboard to create an app and obtain a client
@@ -110,12 +111,59 @@ client = SpotifyClient.from_client_credentials(
 )
 ```
 
+### Authorization Code
+
+Use an authorization code provider for user-scoped endpoints.
+
+```python
+from spotify_sdk.auth import AuthorizationCode
+
+auth = AuthorizationCode(
+    client_id="your-client-id",
+    client_secret="your-client-secret",
+    redirect_uri="http://127.0.0.1:8080/callback",
+    scope=["user-read-private"],
+)
+```
+
+For local scripts, use the helper to avoid manual callback URL copy/paste:
+
+```python
+from spotify_sdk.auth import AuthorizationCode, authorize_local
+
+auth = AuthorizationCode(scope="user-read-private")
+token_info = authorize_local(auth)
+print(token_info.refresh_token)
+```
+
+If you're already in async code, use the async helper:
+
+```python
+from spotify_sdk.auth import AsyncAuthorizationCode, async_authorize_local
+
+auth = AsyncAuthorizationCode(scope="user-read-private")
+token_info = await async_authorize_local(auth)
+print(token_info.refresh_token)
+```
+
+Add a file cache to persist refresh tokens:
+
+```python
+from spotify_sdk.auth import AuthorizationCode, FileTokenCache
+
+auth = AuthorizationCode(
+    scope="user-read-private",
+    token_cache=FileTokenCache(".cache/spotify-sdk/token.json"),
+)
+```
+
 ### Environment Variables
 
-If you omit `client_id` or `client_secret`, the SDK reads:
+If you omit `client_id`, `client_secret`, or `redirect_uri`, the SDK reads:
 
 - `SPOTIFY_SDK_CLIENT_ID`
 - `SPOTIFY_SDK_CLIENT_SECRET`
+- `SPOTIFY_SDK_REDIRECT_URI`
 
 ### Retry Behavior
 
