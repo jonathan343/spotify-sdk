@@ -21,6 +21,7 @@ from urllib.parse import parse_qs, urlencode, urlparse
 import anyio
 import httpx
 import sniffio
+from anyio import from_thread
 
 from ...exceptions import AuthenticationError, ServerError, SpotifyError
 
@@ -733,7 +734,15 @@ def _wait_for_local_callback(
 
 def _resolve_awaitable(value: _T | Awaitable[_T]) -> _T:
     if inspect.isawaitable(value):
-        return asyncio.run(cast(Coroutine[Any, Any, _T], value))
+        awaitable = cast(Awaitable[_T], value)
+        try:
+            return from_thread.run(_return_awaitable, awaitable)
+        except RuntimeError:
+            return asyncio.run(cast(Coroutine[Any, Any, _T], awaitable))
+    return value
+
+
+def _return_awaitable(value: Awaitable[_T]) -> Awaitable[_T]:
     return value
 
 
