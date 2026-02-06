@@ -58,7 +58,7 @@ client = SpotifyClient.from_client_credentials(
 ```
 
 ```python
-# Authorization code provider
+# Authorization code (user-scoped endpoints)
 from spotify_sdk.auth import AuthorizationCode, FileTokenCache, authorize_local
 
 auth = AuthorizationCode(
@@ -69,17 +69,10 @@ auth = AuthorizationCode(
     token_cache=FileTokenCache(".cache/spotify-sdk/token.json"),
 )
 
-# Optional local helper (auto-opens browser and captures callback)
-token_info = authorize_local(auth)
-print(token_info.refresh_token)
-```
+# Local helper: opens browser and captures the callback automatically
+authorize_local(auth)
 
-```python
-# Async local helper
-from spotify_sdk.auth import AsyncAuthorizationCode, async_authorize_local
-
-auth = AsyncAuthorizationCode(scope=["user-read-private"])
-token_info = await async_authorize_local(auth)
+client = SpotifyClient(auth_provider=auth)
 ```
 
 ## Quick Start

@@ -7,8 +7,9 @@
 - Static bearer tokens (`access_token=...`).
 - App-only OAuth via `AsyncClientCredentials` / `ClientCredentials`.
 
-To support user-scoped endpoints (`/me`, library, follows, playback, playlist
-writes), we need an idiomatic Authorization Code + Refresh Token provider that:
+This document records the implemented Authorization Code + Refresh Token
+approach for user-scoped endpoints (`/me`, library, follows, playback, playlist
+writes). Design goals were:
 
 - Fits the existing async-first + unasync architecture.
 - Reuses current auth provider patterns (cache, retries, lock, env fallback).
@@ -25,11 +26,10 @@ writes), we need an idiomatic Authorization Code + Refresh Token provider that:
 ## Non-goals
 
 - PKCE in this iteration.
-- Embedded local HTTP callback server.
-- Automatic browser launching.
+- Embedding browser/callback side effects directly in provider methods.
 - Secure persistent token storage implementation in core SDK.
 
-## Proposed Public API
+## Implemented Public API
 
 ### New provider classes
 
@@ -80,6 +80,27 @@ class AsyncAuthorizationCode:
     async def close(self) -> None: ...
 ```
 
+### Local helper functions
+
+```python
+from spotify_sdk.auth import (
+    AsyncAuthorizationCode,
+    AuthorizationCode,
+    async_authorize_local,
+    authorize_local,
+)
+
+sync_auth = AuthorizationCode(scope="user-read-private")
+sync_token = authorize_local(sync_auth)  # local loopback helper
+
+async_auth = AsyncAuthorizationCode(scope="user-read-private")
+async_token = await async_authorize_local(async_auth)
+```
+
+Both helpers are optional convenience layers for local/CLI flows. Core
+provider methods remain explicit (`get_authorization_url`, `parse_response_url`,
+`exchange_code`).
+
 ### Typical usage
 
 ```python
@@ -121,33 +142,32 @@ async with AsyncSpotifyClient(auth_provider=auth) as client:
 
 - Endpoint: `POST https://accounts.spotify.com/api/token`
 - Headers:
-  - `Authorization: Basic base64(client_id:client_secret)`
-  - `Content-Type: application/x-www-form-urlencoded`
+    - `Authorization: Basic base64(client_id:client_secret)`
+    - `Content-Type: application/x-www-form-urlencoded`
 - Exchange payload:
-  - `grant_type=authorization_code`
-  - `code=<authorization_code>`
-  - `redirect_uri=<registered_redirect_uri>`
+    - `grant_type=authorization_code`
+    - `code=<authorization_code>`
+    - `redirect_uri=<registered_redirect_uri>`
 - Refresh payload:
-  - `grant_type=refresh_token`
-  - `refresh_token=<refresh_token>`
+    - `grant_type=refresh_token`
+    - `refresh_token=<refresh_token>`
 
 ### Authorization URL
 
 - Endpoint: `https://accounts.spotify.com/authorize`
 - Query params:
-  - `response_type=code`
-  - `client_id`
-  - `redirect_uri`
-  - `scope` (space-delimited, optional)
-  - `state` (optional, recommended)
-  - `show_dialog=true` (optional)
+    - `response_type=code`
+    - `client_id`
+    - `redirect_uri`
+    - `scope` (space-delimited, optional)
+    - `state` (optional, recommended)
+    - `show_dialog=true` (optional)
 
 ## Data Model and Cache
 
-Current `TokenInfo` only stores `access_token` + `expires_at`. Authorization
-Code flow needs `refresh_token` support.
+`TokenInfo` stores `access_token`, `expires_at`, `refresh_token`, and `scope`.
 
-### Proposed `TokenInfo` extension (backward compatible)
+### `TokenInfo` shape
 
 ```python
 @dataclass(frozen=True)
@@ -169,15 +189,15 @@ Rationale:
 ### Concurrency
 
 - Keep the same lock pattern as `AsyncClientCredentials`:
-  - `anyio.Lock` in async code.
-  - `threading.Lock` in generated sync code.
+    - `anyio.Lock` in async code.
+    - `threading.Lock` in generated sync code.
 - Use double-checked cache reads to avoid duplicate refresh calls.
 
 ### Retry
 
 - Reuse current backoff strategy and constants:
-  - Retry connection/timeouts and 5xx responses.
-  - Do not retry 4xx OAuth errors except explicit caller retry.
+    - Retry connection/timeouts and 5xx responses.
+    - Do not retry 4xx OAuth errors except explicit caller retry.
 
 ### Error mapping
 
@@ -199,38 +219,37 @@ SpotifyClient(auth_provider=auth)
 
 No changes required to `AsyncBaseClient` / `BaseClient` contract.
 
-### Required implementation touchpoints
+### Implementation touchpoints
 
 - `src/spotify_sdk/_async/auth/__init__.py`:
-  - Add `AsyncAuthorizationCode`.
-  - Extend `TokenInfo`.
-  - Add `ENV_REDIRECT_URI` constant.
+    - Add `AsyncAuthorizationCode`.
+    - Extend `TokenInfo`.
+    - Add `ENV_REDIRECT_URI` constant.
 - `src/spotify_sdk/auth/__init__.py`:
-  - Export `AsyncAuthorizationCode` and generated `AuthorizationCode`.
+    - Export `AsyncAuthorizationCode` and generated `AuthorizationCode`.
 - `scripts/run_unasync.py`:
-  - Add replacement mapping:
-    - `"AsyncAuthorizationCode": "AuthorizationCode"`
+    - Add replacement mapping:
+      - `"AsyncAuthorizationCode": "AuthorizationCode"`
 - Tests:
-  - Add `tests/_async/test_auth_authorization_code.py`.
-  - Regenerate sync tests via `scripts/run_unasync.py`.
+    - Add `tests/_async/test_auth_authorization_code.py`.
+    - Regenerate sync tests via `scripts/run_unasync.py`.
 
 ## Deviations from Spotipy (Intentional)
 
-Compared with `spotipy.SpotifyOAuth` (see
-`/Users/gytndd/dev/personal/spotipy/spotipy/oauth2.py`), this design
-intentionally does **not** include:
+Compared with `spotipy.SpotifyOAuth`, this design keeps provider methods
+explicit and side-effect free by default:
 
-- Browser launching (`open_browser`).
-- Local callback server management.
-- Prompt-driven interactive flows in provider methods.
+- Provider classes handle token mechanics (URL generation, code exchange,
+  refresh) without forcing browser or prompt behavior.
+- Local browser/callback automation is available via opt-in helper functions
+  (`authorize_local` and `async_authorize_local`).
 
 Why:
 
 - Keeps SDK deterministic and side-effect free in libraries/services.
 - Works cleanly in web backends, CLIs, notebooks, and serverless contexts.
 - Avoids coupling auth provider to UI/transport concerns.
-- Matches current `spotify-sdk` pattern where providers handle token mechanics
-  and callers own interaction flow.
+- Preserves convenience for local development through helper APIs.
 
 ## Security and Operational Notes
 
@@ -243,32 +262,27 @@ Why:
 ## Testing Plan
 
 - URL generation:
-  - required params
-  - optional `scope`, `state`, `show_dialog`
+    - required params
+    - optional `scope`, `state`, `show_dialog`
 - Callback parsing:
-  - success path
-  - missing code
-  - `error=` responses
-  - state mismatch
+    - success path
+    - missing code
+    - `error=` responses
+    - state mismatch
 - Token exchange:
-  - successful authorization code exchange
-  - malformed token response handling
+    - successful authorization code exchange
+    - malformed token response handling
 - Refresh:
-  - refresh on expiry
-  - preserve old refresh token when omitted in refresh response
-  - error mapping for token endpoint failures
+    - refresh on expiry
+    - preserve old refresh token when omitted in refresh response
+    - error mapping for token endpoint failures
 - Concurrency:
-  - concurrent expired-token requests result in one refresh call
+    - concurrent expired-token requests result in one refresh call
 - Environment fallback:
-  - `client_id`, `client_secret`, and `redirect_uri` resolution
+    - `client_id`, `client_secret`, and `redirect_uri` resolution
 
 ## References
 
-- Spotify Authorization concepts:
-  - https://developer.spotify.com/documentation/web-api/concepts/authorization
-- Spotify Authorization Code tutorial:
-  - https://developer.spotify.com/documentation/web-api/tutorials/code-flow
-- Spotify Refreshing Tokens tutorial:
-  - https://developer.spotify.com/documentation/web-api/tutorials/refreshing-tokens
-- Spotipy reference implementation:
-  - `/Users/gytndd/dev/personal/spotipy/spotipy/oauth2.py`
+- [Spotify Authorization concepts](https://developer.spotify.com/documentation/web-api/concepts/authorization)
+- [Spotify Authorization Code tutorial](https://developer.spotify.com/documentation/web-api/tutorials/code-flow)
+- [Spotify Refreshing Tokens tutorial](https://developer.spotify.com/documentation/web-api/tutorials/refreshing-tokens)

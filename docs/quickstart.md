@@ -6,17 +6,6 @@ icon: lucide/rocket
 
 This guide covers the basics of using the Spotify SDK.
 
-## Authentication
-
-The SDK supports access tokens, client credentials, and authorization code
-auth. You can supply an access token directly or let the SDK obtain and
-refresh tokens for you.
-
-!!! tip "Getting credentials"
-    Visit the Spotify Developer Dashboard to create an app and obtain a client
-    ID and client secret. Use Spotify's authorization flows to get user tokens
-    when accessing `/me/*` endpoints.
-
 ## Basic Usage
 
 ### Synchronous Client
@@ -86,21 +75,20 @@ asyncio.run(main())
 | `client.playlists` | Get playlists, playlist items, and cover images |
 | `client.tracks` | Get tracks and multiple tracks |
 
-## Configuration
+## Authentication
 
-Customize client behavior:
+The SDK supports access tokens, client credentials, and authorization code
+auth. You can supply an access token directly or let the SDK obtain and
+refresh tokens for you.
 
-```python
-client = SpotifyClient(
-    access_token="your-access-token",
-    timeout=30.0,      # Request timeout in seconds (default: 30.0)
-    max_retries=3,     # Maximum retry attempts (default: 3)
-)
-```
+!!! tip "Getting credentials"
+    Visit the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+    to create an app and obtain a client ID and client secret. Use Spotify's
+    authorization flows to get user tokens when accessing `/me/*` endpoints.
 
 ### Client Credentials
 
-Create clients using client credentials (server-to-server).
+Use client credentials for server-to-server access (no user context).
 
 ```python
 from spotify_sdk import SpotifyClient
@@ -113,57 +101,54 @@ client = SpotifyClient.from_client_credentials(
 
 ### Authorization Code
 
-Use an authorization code provider for user-scoped endpoints.
+Use an authorization code provider for user-scoped endpoints. For local
+scripts, `authorize_local` opens the browser and captures the callback
+automatically:
 
 ```python
-from spotify_sdk.auth import AuthorizationCode
+from spotify_sdk import SpotifyClient
+from spotify_sdk.auth import AuthorizationCode, FileTokenCache, authorize_local
 
 auth = AuthorizationCode(
     client_id="your-client-id",
     client_secret="your-client-secret",
     redirect_uri="http://127.0.0.1:8080/callback",
     scope=["user-read-private"],
-)
-```
-
-For local scripts, use the helper to avoid manual callback URL copy/paste:
-
-```python
-from spotify_sdk.auth import AuthorizationCode, authorize_local
-
-auth = AuthorizationCode(scope="user-read-private")
-token_info = authorize_local(auth)
-print(token_info.refresh_token)
-```
-
-If you're already in async code, use the async helper:
-
-```python
-from spotify_sdk.auth import AsyncAuthorizationCode, async_authorize_local
-
-auth = AsyncAuthorizationCode(scope="user-read-private")
-token_info = await async_authorize_local(auth)
-print(token_info.refresh_token)
-```
-
-Add a file cache to persist refresh tokens:
-
-```python
-from spotify_sdk.auth import AuthorizationCode, FileTokenCache
-
-auth = AuthorizationCode(
-    scope="user-read-private",
     token_cache=FileTokenCache(".cache/spotify-sdk/token.json"),
 )
+
+authorize_local(auth)
+
+with SpotifyClient(auth_provider=auth) as client:
+    ...
 ```
+
+`authorize_local(...)` requires a loopback redirect URI
+(`http://127.0.0.1:<port>/...` or `http://localhost:<port>/...`).
+
+See the [auth reference](reference/auth.md#authorization-code) for the full
+manual flow, async helpers, and additional options.
 
 ### Environment Variables
 
-If you omit `client_id`, `client_secret`, or `redirect_uri`, the SDK reads:
+If you omit `client_id`, `client_secret`, or `redirect_uri` from any auth
+provider, the SDK reads:
 
 - `SPOTIFY_SDK_CLIENT_ID`
 - `SPOTIFY_SDK_CLIENT_SECRET`
-- `SPOTIFY_SDK_REDIRECT_URI`
+- `SPOTIFY_SDK_REDIRECT_URI` (authorization code only)
+
+## Configuration
+
+Customize client behavior:
+
+```python
+client = SpotifyClient(
+    access_token="your-access-token",
+    timeout=30.0,      # Request timeout in seconds (default: 30.0)
+    max_retries=3,     # Maximum retry attempts (default: 3)
+)
+```
 
 ### Retry Behavior
 

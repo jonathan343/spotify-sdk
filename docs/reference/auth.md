@@ -87,16 +87,6 @@ tokens automatically.
     await auth.exchange_code(code)
     ```
 
-### Environment Variables
-
-If `client_id`, `client_secret`, or `redirect_uri` are omitted, the SDK reads:
-
-- `SPOTIFY_SDK_CLIENT_ID`
-- `SPOTIFY_SDK_CLIENT_SECRET`
-- `SPOTIFY_SDK_REDIRECT_URI`
-
-Explicit arguments override environment variables.
-
 ### Local Dev Helper (No Copy/Paste)
 
 For local CLI workflows, use `authorize_local(...)` to open the browser,
@@ -105,32 +95,39 @@ capture the loopback callback automatically, and exchange the code.
 ```python
 from spotify_sdk.auth import AuthorizationCode, authorize_local
 
-auth = AuthorizationCode(
-    scope="user-library-read",
-)
-
+auth = AuthorizationCode(scope="user-read-private")
 token_info = authorize_local(auth)
 print(token_info.refresh_token)
 ```
 
-`authorize_local` requires a loopback redirect URI (`http://127.0.0.1:PORT/...`
-or `http://localhost:PORT/...`).
+`authorize_local` requires a loopback redirect URI
+(`http://127.0.0.1:<port>/...` or `http://localhost:<port>/...`).
 
-For async applications (notebooks, async CLIs, web handlers), use
-`async_authorize_local(...)`:
+For async code (notebooks, async CLIs), use `async_authorize_local(...)`:
 
 ```python
 from spotify_sdk.auth import AsyncAuthorizationCode, async_authorize_local
 
-auth = AsyncAuthorizationCode(scope="user-library-read")
+auth = AsyncAuthorizationCode(scope="user-read-private")
 token_info = await async_authorize_local(auth)
 print(token_info.refresh_token)
 ```
 
+## Environment Variables
+
+If `client_id`, `client_secret`, or `redirect_uri` are omitted from any auth
+provider, the SDK reads:
+
+- `SPOTIFY_SDK_CLIENT_ID`
+- `SPOTIFY_SDK_CLIENT_SECRET`
+- `SPOTIFY_SDK_REDIRECT_URI` (authorization code only)
+
+Explicit arguments override environment variables.
+
 ## Token Cache
 
-The client credentials provider caches tokens in memory by default. You can
-pass a custom cache implementation that follows this interface:
+Auth providers cache tokens in memory by default. You can pass a custom cache
+implementation that follows this interface:
 
 ```python
 from typing import Protocol
@@ -155,10 +152,16 @@ from spotify_sdk.auth import AuthorizationCode, FileTokenCache
 
 cache = FileTokenCache(path=".cache/spotify-sdk/token.json")
 auth = AuthorizationCode(
-    scope="user-library-read",
+    scope="user-read-private",
     token_cache=cache,
 )
 ```
+
+!!! note "Strict type-checking in sync code"
+    With current public exports, strict Pyright settings can report a
+    `TokenCache` protocol mismatch when passing `FileTokenCache` to
+    `AuthorizationCode`. Runtime behavior is correct; if needed, use
+    `cast(Any, FileTokenCache(...))` as a temporary workaround.
 
 ### TokenInfo
 
