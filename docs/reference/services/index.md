@@ -43,3 +43,4 @@ attributes on the client instance.
 | [Artists](artists.md) | Artist profiles, albums, and top tracks |
 | [Playlists](playlists.md) | Playlist details, items, and images |
 | [Tracks](tracks.md) | Track details and bulk lookups |
+| [Users](users.md) | Current-user profile, top items, and playlist follows |

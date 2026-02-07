@@ -29,6 +29,7 @@ nav = [
             "reference/services/artists.md",
             "reference/services/playlists.md",
             "reference/services/tracks.md",
+            "reference/services/users.md",
         ]},
     ]},
     {"Design" = [
