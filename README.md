@@ -40,13 +40,40 @@ Python version support follows the [official Python release cycle](https://devgu
 
 ## Authentication
 
-The SDK currently supports [access token](https://developer.spotify.com/documentation/web-api/concepts/access-token) authentication. You'll need to obtain an access token through Spotify's authorization flows before using the SDK.
+The SDK supports:
+
+- [Access token](https://developer.spotify.com/documentation/web-api/concepts/access-token) authentication
+- Client credentials flow
+- Authorization code flow with refresh tokens
 
 ```python
+# Access token
 client = SpotifyClient(access_token="your-access-token")
+
+# Client credentials
+client = SpotifyClient.from_client_credentials(
+    client_id="your-client-id",
+    client_secret="your-client-secret",
+)
 ```
 
-Additional authentication methods are planned for future releases.
+```python
+# Authorization code (user-scoped endpoints)
+from spotify_sdk.auth import AuthorizationCode, FileTokenCache, authorize_local
+
+auth = AuthorizationCode(
+    client_id="your-client-id",
+    client_secret="your-client-secret",
+    redirect_uri="http://127.0.0.1:8080/callback",
+    scope=["user-read-private"],
+    token_cache=FileTokenCache(".cache/spotify-sdk/token.json"),
+)
+
+# Local helper: opens browser and captures the callback automatically
+authorize_local(auth)
+
+client = SpotifyClient(auth_provider=auth)
+```
 
 ## Quick Start
 

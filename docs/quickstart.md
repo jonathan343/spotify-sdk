@@ -6,16 +6,6 @@ icon: lucide/rocket
 
 This guide covers the basics of using the Spotify SDK.
 
-## Authentication
-
-The SDK supports access tokens and the client credentials flow. You can supply
-an access token directly or let the SDK obtain and refresh tokens for you.
-
-!!! tip "Getting credentials"
-    Visit the Spotify Developer Dashboard to create an app and obtain a client
-    ID and client secret. Use Spotify's authorization flows to get user tokens
-    when accessing `/me/*` endpoints.
-
 ## Basic Usage
 
 ### Synchronous Client
@@ -85,6 +75,69 @@ asyncio.run(main())
 | `client.playlists` | Get playlists, playlist items, and cover images |
 | `client.tracks` | Get tracks and multiple tracks |
 
+## Authentication
+
+The SDK supports access tokens, client credentials, and authorization code
+auth. You can supply an access token directly or let the SDK obtain and
+refresh tokens for you.
+
+!!! tip "Getting credentials"
+    Visit the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+    to create an app and obtain a client ID and client secret. Use Spotify's
+    authorization flows to get user tokens when accessing `/me/*` endpoints.
+
+### Client Credentials
+
+Use client credentials for server-to-server access (no user context).
+
+```python
+from spotify_sdk import SpotifyClient
+
+client = SpotifyClient.from_client_credentials(
+    client_id="your-client-id",
+    client_secret="your-client-secret",
+)
+```
+
+### Authorization Code
+
+Use an authorization code provider for user-scoped endpoints. For local
+scripts, `authorize_local` opens the browser and captures the callback
+automatically:
+
+```python
+from spotify_sdk import SpotifyClient
+from spotify_sdk.auth import AuthorizationCode, FileTokenCache, authorize_local
+
+auth = AuthorizationCode(
+    client_id="your-client-id",
+    client_secret="your-client-secret",
+    redirect_uri="http://127.0.0.1:8080/callback",
+    scope=["user-read-private"],
+    token_cache=FileTokenCache(".cache/spotify-sdk/token.json"),
+)
+
+authorize_local(auth)
+
+with SpotifyClient(auth_provider=auth) as client:
+    ...
+```
+
+`authorize_local(...)` requires a loopback redirect URI
+(`http://127.0.0.1:<port>/...` or `http://localhost:<port>/...`).
+
+See the [auth reference](reference/auth.md#authorization-code) for the full
+manual flow, async helpers, and additional options.
+
+### Environment Variables
+
+If you omit `client_id`, `client_secret`, or `redirect_uri` from any auth
+provider, the SDK reads:
+
+- `SPOTIFY_SDK_CLIENT_ID`
+- `SPOTIFY_SDK_CLIENT_SECRET`
+- `SPOTIFY_SDK_REDIRECT_URI` (authorization code only)
+
 ## Configuration
 
 Customize client behavior:
@@ -96,26 +149,6 @@ client = SpotifyClient(
     max_retries=3,     # Maximum retry attempts (default: 3)
 )
 ```
-
-### Client Credentials
-
-Create clients using client credentials (server-to-server).
-
-```python
-from spotify_sdk import SpotifyClient
-
-client = SpotifyClient.from_client_credentials(
-    client_id="your-client-id",
-    client_secret="your-client-secret",
-)
-```
-
-### Environment Variables
-
-If you omit `client_id` or `client_secret`, the SDK reads:
-
-- `SPOTIFY_SDK_CLIENT_ID`
-- `SPOTIFY_SDK_CLIENT_SECRET`
 
 ### Retry Behavior
 

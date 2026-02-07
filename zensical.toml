@@ -38,6 +38,7 @@ nav = [
         ]},
         {"Auth" = [
             "design/auth/client-credentials.md",
+            "design/auth/authorization-code-refresh-token.md",
         ]},
     ]},
 ]
