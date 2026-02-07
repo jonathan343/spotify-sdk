@@ -6,6 +6,7 @@ from spotify_sdk import AsyncSpotifyClient
 from spotify_sdk._async.auth import AsyncClientCredentials
 from spotify_sdk._async.services.albums import AsyncAlbumService
 from spotify_sdk._async.services.audiobooks import AsyncAudiobookService
+from spotify_sdk._async.services.users import AsyncUserService
 
 
 class TestSpotifyClientInit:
@@ -33,6 +34,11 @@ class TestSpotifyClientInit:
         client = AsyncSpotifyClient(access_token="test-token")
         assert hasattr(client, "audiobooks")
         assert isinstance(client.audiobooks, AsyncAudiobookService)
+
+    def test_has_users_service(self):
+        client = AsyncSpotifyClient(access_token="test-token")
+        assert hasattr(client, "users")
+        assert isinstance(client.users, AsyncUserService)
 
     def test_auth_provider(self):
         auth_provider = AsyncClientCredentials(

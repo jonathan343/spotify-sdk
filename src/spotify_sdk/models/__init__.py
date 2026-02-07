@@ -13,6 +13,8 @@ from .audiobook import (
 )
 from .common import (
     Copyright,
+    Cursor,
+    CursorPage,
     ExternalIds,
     ExternalUrls,
     Followers,
@@ -29,6 +31,7 @@ from .playlist import (
     SimplifiedPlaylist,
 )
 from .track import SimplifiedTrack, Track
+from .user import CurrentUser, ExplicitContent
 
 # Rebuild models that use forward references
 Album.model_rebuild()
@@ -38,6 +41,8 @@ PlaylistTrack.model_rebuild()
 __all__ = [
     # Common
     "Copyright",
+    "Cursor",
+    "CursorPage",
     "ExternalIds",
     "ExternalUrls",
     "Followers",
@@ -51,6 +56,9 @@ __all__ = [
     # Track
     "SimplifiedTrack",
     "Track",
+    # User
+    "CurrentUser",
+    "ExplicitContent",
     # Album
     "Album",
     "SimplifiedAlbum",
