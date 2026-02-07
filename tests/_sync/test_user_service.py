@@ -414,6 +414,40 @@ class TestUserServiceCheckFollowsArtistsOrUsers:
             with pytest.raises(ValueError, match="ids cannot be empty"):
                 client.users.check_follows_artists_or_users("artist", [])
 
+    def test_check_follows_artists_or_users_invalid_shape_raises_error(
+        self, httpx_mock: HTTPXMock
+    ):
+        httpx_mock.add_response(
+            url=(
+                "https://api.spotify.com/v1/me/following/contains"
+                "?type=artist&ids=artist123"
+            ),
+            json={"unexpected": True},
+        )
+
+        with SpotifyClient(access_token="test-token") as client:
+            with pytest.raises(ValueError, match="Expected list response"):
+                client.users.check_follows_artists_or_users(
+                    "artist", ["artist123"]
+                )
+
+    def test_check_follows_artists_or_users_invalid_item_type_raises_error(
+        self, httpx_mock: HTTPXMock
+    ):
+        httpx_mock.add_response(
+            url=(
+                "https://api.spotify.com/v1/me/following/contains"
+                "?type=artist&ids=artist123"
+            ),
+            json=[True, "nope"],
+        )
+
+        with SpotifyClient(access_token="test-token") as client:
+            with pytest.raises(ValueError, match="Expected list\\[bool\\]"):
+                client.users.check_follows_artists_or_users(
+                    "artist", ["artist123"]
+                )
+
 
 class TestUserServiceCheckIfFollowsPlaylist:
     def test_check_if_follows_playlist_empty_id_raises_error(self):
@@ -443,3 +477,37 @@ class TestUserServiceCheckIfFollowsPlaylist:
             )
 
         assert result == [True, False]
+
+    def test_check_if_follows_playlist_invalid_shape_raises_error(
+        self, httpx_mock: HTTPXMock
+    ):
+        httpx_mock.add_response(
+            url=(
+                "https://api.spotify.com/v1/playlists/playlist123"
+                "/followers/contains?ids=user123"
+            ),
+            json={"unexpected": True},
+        )
+
+        with SpotifyClient(access_token="test-token") as client:
+            with pytest.raises(ValueError, match="Expected list response"):
+                client.users.check_if_follows_playlist(
+                    "playlist123", ["user123"]
+                )
+
+    def test_check_if_follows_playlist_invalid_item_type_raises_error(
+        self, httpx_mock: HTTPXMock
+    ):
+        httpx_mock.add_response(
+            url=(
+                "https://api.spotify.com/v1/playlists/playlist123"
+                "/followers/contains?ids=user123"
+            ),
+            json=[True, 1],
+        )
+
+        with SpotifyClient(access_token="test-token") as client:
+            with pytest.raises(ValueError, match="Expected list\\[bool\\]"):
+                client.users.check_if_follows_playlist(
+                    "playlist123", ["user123"]
+                )

@@ -179,11 +179,15 @@ class AsyncUserService(AsyncBaseService):
             A list of booleans aligned to input ids.
 
         Raises:
-            ValueError: If ids is empty or type_ is invalid.
+            ValueError: If ids is empty, type_ is invalid, or the response
+                shape is not `list[bool]`.
         """
         params = self._build_follow_params(type_=type_, ids=ids)
         data = await self._get("/me/following/contains", params=params)
-        return [bool(value) for value in data]
+        return self._validate_bool_list_response(
+            data,
+            endpoint="/me/following/contains",
+        )
 
     async def check_if_follows_playlist(
         self, id: str, user_ids: list[str]
@@ -198,7 +202,8 @@ class AsyncUserService(AsyncBaseService):
             A list of booleans aligned to input user_ids.
 
         Raises:
-            ValueError: If id is empty or user_ids is empty.
+            ValueError: If id is empty, user_ids is empty, or the response
+                shape is not `list[bool]`.
         """
         if not id:
             raise ValueError("id cannot be empty")
@@ -209,7 +214,10 @@ class AsyncUserService(AsyncBaseService):
             f"/playlists/{id}/followers/contains",
             params={"ids": ",".join(user_ids)},
         )
-        return [bool(value) for value in data]
+        return self._validate_bool_list_response(
+            data,
+            endpoint=f"/playlists/{id}/followers/contains",
+        )
 
     def _build_top_items_params(
         self,
@@ -240,3 +248,17 @@ class AsyncUserService(AsyncBaseService):
         if not ids:
             raise ValueError("ids cannot be empty")
         return {"type": type_, "ids": ",".join(ids)}
+
+    def _validate_bool_list_response(
+        self,
+        data: object,
+        endpoint: str,
+    ) -> list[bool]:
+        if not isinstance(data, list):
+            raise ValueError(
+                "Expected list response from "
+                f"{endpoint}, got {type(data).__name__}"
+            )
+        if not all(isinstance(value, bool) for value in data):
+            raise ValueError(f"Expected list[bool] response from {endpoint}")
+        return data
