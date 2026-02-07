@@ -71,3 +71,21 @@ class Page(SpotifyModel, Generic[T]):
     previous: str | None
     total: int
     items: list[T]
+
+
+class Cursor(SpotifyModel):
+    """Cursor keys for cursor-based pagination."""
+
+    after: str | None = None
+    before: str | None = None
+
+
+class CursorPage(SpotifyModel, Generic[T]):
+    """Cursor-paginated response containing items and a next page link."""
+
+    href: str
+    limit: int
+    next: str | None
+    cursors: Cursor
+    total: int
+    items: list[T]

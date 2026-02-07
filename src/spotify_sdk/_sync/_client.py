@@ -12,6 +12,7 @@ from .services.audiobooks import AudiobookService
 from .services.chapters import ChapterService
 from .services.playlists import PlaylistService
 from .services.tracks import TrackService
+from .services.users import UserService
 
 
 class SpotifyClient:
@@ -72,6 +73,7 @@ class SpotifyClient:
         self.tracks = TrackService(self._base_client)
         self.artists = ArtistService(self._base_client)
         self.playlists = PlaylistService(self._base_client)
+        self.users = UserService(self._base_client)
 
     def close(self) -> None:
         """Close the client and release resources."""

@@ -46,6 +46,13 @@ They are shared by sync and async clients.
         members: true
         show_if_no_docstring: true
 
+## User models
+
+::: spotify_sdk.models.user
+    options:
+        members: true
+        show_if_no_docstring: true
+
 ## Common models
 
 ::: spotify_sdk.models.common

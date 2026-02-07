@@ -19,7 +19,7 @@ class BaseService:
         path: str,
         params: dict[str, Any] | None = None,
         **options: Any,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Make a GET request."""
         return self._client.request("GET", path, params=params, **options)
 
@@ -28,7 +28,7 @@ class BaseService:
         path: str,
         json: dict[str, Any] | None = None,
         **options: Any,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Make a POST request."""
         return self._client.request("POST", path, json=json, **options)
 
@@ -37,7 +37,7 @@ class BaseService:
         path: str,
         json: dict[str, Any] | None = None,
         **options: Any,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Make a PUT request."""
         return self._client.request("PUT", path, json=json, **options)
 
@@ -45,6 +45,6 @@ class BaseService:
         self,
         path: str,
         **options: Any,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Make a DELETE request."""
         return self._client.request("DELETE", path, **options)

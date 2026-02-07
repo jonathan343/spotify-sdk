@@ -12,6 +12,7 @@ from .services.audiobooks import AsyncAudiobookService
 from .services.chapters import AsyncChapterService
 from .services.playlists import AsyncPlaylistService
 from .services.tracks import AsyncTrackService
+from .services.users import AsyncUserService
 
 
 class AsyncSpotifyClient:
@@ -72,6 +73,7 @@ class AsyncSpotifyClient:
         self.tracks = AsyncTrackService(self._base_client)
         self.artists = AsyncArtistService(self._base_client)
         self.playlists = AsyncPlaylistService(self._base_client)
+        self.users = AsyncUserService(self._base_client)
 
     async def close(self) -> None:
         """Close the client and release resources."""

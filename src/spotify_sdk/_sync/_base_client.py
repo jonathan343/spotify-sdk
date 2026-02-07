@@ -95,7 +95,7 @@ class BaseClient:
         json: dict[str, Any] | None = None,
         timeout: float | None = None,  # noqa: ASYNC109
         max_retries: int | None = None,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Make an HTTP request to the Spotify API.
 
         Args:
@@ -154,7 +154,7 @@ class BaseClient:
 
         raise last_exception or SpotifyError("Request failed after retries")
 
-    def _handle_response(self, response: httpx.Response) -> dict[str, Any]:
+    def _handle_response(self, response: httpx.Response) -> Any:
         """Process HTTP response and raise appropriate exceptions."""
         if response.status_code == 204:
             return {}
@@ -192,12 +192,13 @@ class BaseClient:
         else:
             raise SpotifyError(error_message, response.status_code, data)
 
-    def _extract_error_message(self, data: dict[str, Any]) -> str:
+    def _extract_error_message(self, data: Any) -> str:
         """Extract error message from Spotify error response."""
-        if "error" in data:
+        if isinstance(data, dict) and "error" in data:
             error = data["error"]
             if isinstance(error, dict):
-                return error.get("message", "Unknown error")
+                message = error.get("message", "Unknown error")
+                return str(message)
             return str(error)
         return "Unknown error"
 
