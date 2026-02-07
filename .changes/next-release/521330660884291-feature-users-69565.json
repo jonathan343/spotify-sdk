@@ -1,5 +1,0 @@
-{
-  "type": "feature",
-  "category": "users",
-  "description": "Add `AsyncUserService`/`UserService` with user APIs for current profile, top artists/tracks, playlist follow/unfollow, followed artists, artist/user follow/unfollow, and follow-status checks. ([#44](https://github.com/jonathan343/spotify-sdk/pull/44))"
-}

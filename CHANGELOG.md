@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.6.0
+
+### Features
+* Add [Authorization Code](https://developer.spotify.com/documentation/web-api/tutorials/code-flow) + refresh-token auth with local loopback helpers, file token cache, and async helper loop-safety fixes; update auth docs/design for consistent setup and usage guidance. ([#43](https://github.com/jonathan343/spotify-sdk/pull/43))
+* Add `AsyncUserService`/`UserService` with user APIs for current profile, top artists/tracks, playlist follow/unfollow, followed artists, artist/user follow/unfollow, and follow-status checks. ([#44](https://github.com/jonathan343/spotify-sdk/pull/44))
+
+### Documentation
+* Update docs for the new users service (quickstart + reference pages). ([#44](https://github.com/jonathan343/spotify-sdk/pull/44))
+
 ## v0.5.0
 
 ### Features

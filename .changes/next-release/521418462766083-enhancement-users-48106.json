@@ -1,5 +1,0 @@
-{
-  "type": "enhancement",
-  "category": "users",
-  "description": "Update docs for the new users service (quickstart + reference pages). ([#44](https://github.com/jonathan343/spotify-sdk/pull/44))"
-}
