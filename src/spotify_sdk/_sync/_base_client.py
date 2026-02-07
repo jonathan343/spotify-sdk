@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import random
 import time
-from typing import Any, TypeAlias
+from typing import Any
 
 import httpx
 
@@ -18,11 +18,6 @@ from ..exceptions import (
     SpotifyError,
 )
 from .auth import AuthProvider
-
-JSONPrimitive: TypeAlias = str | int | float | bool | None
-JSONValue: TypeAlias = (
-    JSONPrimitive | dict[str, "JSONValue"] | list["JSONValue"]
-)
 
 
 class BaseClient:
@@ -100,7 +95,7 @@ class BaseClient:
         json: dict[str, Any] | None = None,
         timeout: float | None = None,  # noqa: ASYNC109
         max_retries: int | None = None,
-    ) -> JSONValue:
+    ) -> Any:
         """Make an HTTP request to the Spotify API.
 
         Args:
@@ -159,7 +154,7 @@ class BaseClient:
 
         raise last_exception or SpotifyError("Request failed after retries")
 
-    def _handle_response(self, response: httpx.Response) -> JSONValue:
+    def _handle_response(self, response: httpx.Response) -> Any:
         """Process HTTP response and raise appropriate exceptions."""
         if response.status_code == 204:
             return {}
@@ -197,7 +192,7 @@ class BaseClient:
         else:
             raise SpotifyError(error_message, response.status_code, data)
 
-    def _extract_error_message(self, data: JSONValue) -> str:
+    def _extract_error_message(self, data: Any) -> str:
         """Extract error message from Spotify error response."""
         if isinstance(data, dict) and "error" in data:
             error = data["error"]

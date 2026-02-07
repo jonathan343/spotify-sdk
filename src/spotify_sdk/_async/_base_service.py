@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from ._base_client import AsyncBaseClient, JSONValue
+    from ._base_client import AsyncBaseClient
 
 
 class AsyncBaseService:
@@ -19,7 +19,7 @@ class AsyncBaseService:
         path: str,
         params: dict[str, Any] | None = None,
         **options: Any,
-    ) -> "JSONValue":
+    ) -> Any:
         """Make a GET request."""
         return await self._client.request(
             "GET", path, params=params, **options
@@ -30,7 +30,7 @@ class AsyncBaseService:
         path: str,
         json: dict[str, Any] | None = None,
         **options: Any,
-    ) -> "JSONValue":
+    ) -> Any:
         """Make a POST request."""
         return await self._client.request("POST", path, json=json, **options)
 
@@ -39,7 +39,7 @@ class AsyncBaseService:
         path: str,
         json: dict[str, Any] | None = None,
         **options: Any,
-    ) -> "JSONValue":
+    ) -> Any:
         """Make a PUT request."""
         return await self._client.request("PUT", path, json=json, **options)
 
@@ -47,6 +47,6 @@ class AsyncBaseService:
         self,
         path: str,
         **options: Any,
-    ) -> "JSONValue":
+    ) -> Any:
         """Make a DELETE request."""
         return await self._client.request("DELETE", path, **options)
