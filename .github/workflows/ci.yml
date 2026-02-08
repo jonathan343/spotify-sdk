@@ -27,7 +27,7 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b # v7
         with:
-          python-version-file: .python-version
+          python-version: "3.10"
       - name: Install dependencies
         run: uv sync --group lint
       # Update output format to enable automatic inline annotations.
@@ -45,7 +45,7 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b # v7
         with:
-          python-version-file: .python-version
+          python-version: "3.10"
       - name: Install dependencies
         run: uv sync --group typecheck
       - name: Run type checking
@@ -60,7 +60,7 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b # v7
         with:
-          python-version-file: .python-version
+          python-version: "3.10"
       - name: Install dependencies
         run: uv sync --group codegen
       - name: Check sync code is up to date
@@ -70,14 +70,19 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    name: Test
+    continue-on-error: ${{ matrix.python-version == '3.15-dev' }}
+    name: Test (Python ${{ matrix.python-version }})
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15-dev"]
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b # v7
         with:
-          python-version-file: .python-version
+          python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: uv sync --group test
       - name: Run tests
