@@ -1,5 +1,6 @@
 """Album models."""
 
+from datetime import datetime
 from typing import TYPE_CHECKING, Literal
 
 from pydantic import Field
@@ -46,3 +47,10 @@ class Album(SimplifiedAlbum):
     external_ids: ExternalIds
     label: str
     popularity: int
+
+
+class SavedAlbum(SpotifyModel):
+    """Album saved in a user's library with timestamp metadata."""
+
+    added_at: datetime
+    album: Album
