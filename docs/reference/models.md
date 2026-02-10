@@ -13,6 +13,8 @@ They are shared by sync and async clients.
 
 ## Album models
 
+Includes `SimplifiedAlbum`, `Album`, and `SavedAlbum`.
+
 ::: spotify_sdk.models.album
     options:
         members: true

@@ -4,7 +4,7 @@ import pytest
 from pytest_httpx import HTTPXMock
 
 from spotify_sdk import SpotifyClient
-from spotify_sdk.models import Album, Page, SimplifiedTrack
+from spotify_sdk.models import Album, Page, SavedAlbum, SimplifiedTrack
 
 # Minimal album response for testing
 ALBUM_RESPONSE = {
@@ -81,6 +81,11 @@ TRACK_RESPONSE = {
     "type": "track",
     "uri": "spotify:track:789",
     "is_local": False,
+}
+
+SAVED_ALBUM_RESPONSE = {
+    "added_at": "2024-01-15T12:34:56Z",
+    "album": ALBUM_RESPONSE,
 }
 
 
@@ -197,3 +202,100 @@ class TestAlbumServiceGetTracks:
         assert page.limit == 10
         assert page.offset == 5
         assert page.total == 16
+
+
+class TestAlbumServiceGetSaved:
+    def test_get_saved(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(
+            url="https://api.spotify.com/v1/me/albums?limit=20&offset=0",
+            json={
+                "href": "https://api.spotify.com/v1/me/albums",
+                "limit": 20,
+                "next": None,
+                "offset": 0,
+                "previous": None,
+                "total": 1,
+                "items": [SAVED_ALBUM_RESPONSE],
+            },
+        )
+
+        with SpotifyClient(access_token="test-token") as client:
+            page = client.albums.get_saved()
+
+        assert isinstance(page, Page)
+        assert page.total == 1
+        assert len(page.items) == 1
+        assert isinstance(page.items[0], SavedAlbum)
+        assert page.items[0].album.id == "123"
+
+    def test_get_saved_with_market_and_pagination(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(
+            url=(
+                "https://api.spotify.com/v1/me/albums"
+                "?limit=10&offset=5&market=US"
+            ),
+            json={
+                "href": "https://api.spotify.com/v1/me/albums",
+                "limit": 10,
+                "next": None,
+                "offset": 5,
+                "previous": None,
+                "total": 1,
+                "items": [SAVED_ALBUM_RESPONSE],
+            },
+        )
+
+        with SpotifyClient(access_token="test-token") as client:
+            page = client.albums.get_saved(
+                limit=10,
+                offset=5,
+                market="US",
+            )
+
+        assert page.limit == 10
+        assert page.offset == 5
+        assert page.items[0].album.id == "123"
+
+
+class TestAlbumServiceCheckSaved:
+    def test_check_saved(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(
+            url=(
+                "https://api.spotify.com/v1/me/albums/contains?ids=123%2C456"
+            ),
+            json=[True, False],
+        )
+
+        with SpotifyClient(access_token="test-token") as client:
+            result = client.albums.check_saved(["123", "456"])
+
+        assert result == [True, False]
+
+    def test_check_saved_empty_ids_raises_error(self):
+        with SpotifyClient(access_token="test-token") as client:
+            with pytest.raises(ValueError, match="ids cannot be empty"):
+                client.albums.check_saved([])
+
+    def test_check_saved_invalid_shape_raises_error(
+        self, httpx_mock: HTTPXMock
+    ):
+        httpx_mock.add_response(
+            url="https://api.spotify.com/v1/me/albums/contains?ids=123",
+            json={"unexpected": True},
+        )
+
+        with SpotifyClient(access_token="test-token") as client:
+            with pytest.raises(ValueError, match="Expected list response"):
+                client.albums.check_saved(["123"])
+
+    def test_check_saved_invalid_item_type_raises_error(
+        self, httpx_mock: HTTPXMock
+    ):
+        httpx_mock.add_response(
+            url="https://api.spotify.com/v1/me/albums/contains?ids=123",
+            json=[True, "nope"],
+        )
+
+        with SpotifyClient(access_token="test-token") as client:
+            with pytest.raises(ValueError, match="Expected list\\[bool\\]"):
+                client.albums.check_saved(["123"])

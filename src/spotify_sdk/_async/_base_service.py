@@ -50,3 +50,18 @@ class AsyncBaseService:
     ) -> Any:
         """Make a DELETE request."""
         return await self._client.request("DELETE", path, **options)
+
+    def _validate_bool_list_response(
+        self,
+        data: object,
+        endpoint: str,
+    ) -> list[bool]:
+        """Validate Spotify `contains`-style responses."""
+        if not isinstance(data, list):
+            raise ValueError(
+                "Expected list response from "
+                f"{endpoint}, got {type(data).__name__}"
+            )
+        if not all(isinstance(value, bool) for value in data):
+            raise ValueError(f"Expected list[bool] response from {endpoint}")
+        return data

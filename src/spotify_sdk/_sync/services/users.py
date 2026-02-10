@@ -246,17 +246,3 @@ class UserService(BaseService):
         if not ids:
             raise ValueError("ids cannot be empty")
         return {"type": type_, "ids": ",".join(ids)}
-
-    def _validate_bool_list_response(
-        self,
-        data: object,
-        endpoint: str,
-    ) -> list[bool]:
-        if not isinstance(data, list):
-            raise ValueError(
-                "Expected list response from "
-                f"{endpoint}, got {type(data).__name__}"
-            )
-        if not all(isinstance(value, bool) for value in data):
-            raise ValueError(f"Expected list[bool] response from {endpoint}")
-        return data

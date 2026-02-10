@@ -1,6 +1,6 @@
 """Pydantic models for Spotify API responses."""
 
-from .album import Album, SimplifiedAlbum
+from .album import Album, SavedAlbum, SimplifiedAlbum
 from .artist import Artist, SimplifiedArtist
 from .audiobook import (
     Audiobook,
@@ -61,6 +61,7 @@ __all__ = [
     "ExplicitContent",
     # Album
     "Album",
+    "SavedAlbum",
     "SimplifiedAlbum",
     # Audiobook
     "Audiobook",
