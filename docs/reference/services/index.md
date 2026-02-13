@@ -41,6 +41,7 @@ attributes on the client instance.
 | [Audiobooks](audiobooks.md) | Audiobook details and chapter lookups |
 | [Chapters](chapters.md) | Chapter details and bulk lookups |
 | [Artists](artists.md) | Artist profiles, albums, and top tracks |
+| [Library](library.md) | Save, remove, and check items in the user's library |
 | [Playlists](playlists.md) | Playlist details, items, and images |
 | [Tracks](tracks.md) | Track details and bulk lookups |
 | [Users](users.md) | Current-user profile, top items, and playlist follows |

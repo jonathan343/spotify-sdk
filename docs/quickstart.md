@@ -72,6 +72,7 @@ asyncio.run(main())
 |---------|-------------|
 | `client.albums` | Get albums, album tracks, and multiple albums |
 | `client.artists` | Get artists, artist albums, and top tracks |
+| `client.library` | Save, remove, and check items in a user's library |
 | `client.playlists` | Get playlists, playlist items, and cover images |
 | `client.tracks` | Get tracks and multiple tracks |
 | `client.users` | Get current profile, top artists/tracks, and follow playlists |
