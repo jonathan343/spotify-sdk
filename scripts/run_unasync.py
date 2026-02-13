@@ -18,6 +18,7 @@ ADDITIONAL_REPLACEMENTS = {
     "AsyncAuthProvider": "AuthProvider",
     "AsyncClientCredentials": "ClientCredentials",
     "AsyncAuthorizationCode": "AuthorizationCode",
+    "async_authorize_local": "authorize_local",
     "AsyncAlbumService": "AlbumService",
     "AsyncTrackService": "TrackService",
     "AsyncArtistService": "ArtistService",

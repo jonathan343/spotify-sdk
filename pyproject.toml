@@ -97,3 +97,9 @@ docstring-code-format = true
 [tool.ruff.lint.per-file-ignores]
 # Ignore all docstring rules (D) in the entire tests directory
 "tests/*" = ["D"]
+
+[tool.pytest.ini_options]
+addopts = "-m 'not integration'"
+markers = [
+  "integration: marks tests that hit real Spotify APIs and require credentials",
+]
