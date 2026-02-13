@@ -32,7 +32,7 @@ reference is grouped by service with code tabs for the sync and async styles.
 
     ---
 
-    Albums, audiobooks, chapters, artists, playlists, tracks, and users operations.
+    Albums, audiobooks, chapters, artists, library, playlists, tracks, and users operations.
 
     [:octicons-arrow-right-24: Services](services/index.md)
 

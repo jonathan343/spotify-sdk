@@ -18,12 +18,14 @@ ADDITIONAL_REPLACEMENTS = {
     "AsyncAuthProvider": "AuthProvider",
     "AsyncClientCredentials": "ClientCredentials",
     "AsyncAuthorizationCode": "AuthorizationCode",
+    "async_authorize_local": "authorize_local",
     "AsyncAlbumService": "AlbumService",
     "AsyncTrackService": "TrackService",
     "AsyncArtistService": "ArtistService",
     "AsyncPlaylistService": "PlaylistService",
     "AsyncChapterService": "ChapterService",
     "AsyncAudiobookService": "AudiobookService",
+    "AsyncLibraryService": "LibraryService",
     "AsyncUserService": "UserService",
     # Override unasync default Async→Sync prefix to get httpx.Client
     # (not httpx.SyncClient).

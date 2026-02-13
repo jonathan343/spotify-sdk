@@ -147,6 +147,7 @@ The main client exposes service objects as attributes:
 | --- | --- |
 | `client.albums` | Album operations |
 | `client.artists` | Artist operations |
+| `client.library` | Save, remove, and check library items |
 | `client.playlists` | Playlist operations |
 | `client.tracks` | Track operations |
 | `client.users` | Current user and profile operations |
