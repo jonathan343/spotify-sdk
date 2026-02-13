@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.7.0
+
+### Features
+* Added support for user saved album library endpoints with `albums.get_saved(...)` and `albums.check_saved(...)`, now enabled by authorization code flow with scopes. Also introduced the `SavedAlbum` model and documented the new album APIs. ([#48](https://github.com/jonathan343/spotify-sdk/pull/48))
+* Add `AsyncLibraryService`/`LibraryService` for URI-based user library save/remove/contains operations, with client wiring, docs, and unit/integration test coverage. ([#50](https://github.com/jonathan343/spotify-sdk/pull/50))
+
 ## v0.6.0
 
 ### Features
