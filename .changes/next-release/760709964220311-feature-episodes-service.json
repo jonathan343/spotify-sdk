@@ -1,5 +1,0 @@
-{
-  "type": "feature",
-  "category": "episodes",
-  "description": "Add `AsyncEpisodeService`/`EpisodeService` with `get` and `get_saved` operations; add `SavedEpisode` model support, wire `client.episodes`, and include async/sync unit + integration coverage. ([#52](https://github.com/jonathan343/spotify-sdk/pull/52))"
-}
