@@ -43,5 +43,6 @@ attributes on the client instance.
 | [Artists](artists.md) | Artist profiles, albums, and top tracks |
 | [Library](library.md) | Save, remove, and check items in the user's library |
 | [Playlists](playlists.md) | Playlist details, items, and images |
+| [Shows](shows.md) | Show details, episode lists, and saved shows |
 | [Tracks](tracks.md) | Track details and bulk lookups |
 | [Users](users.md) | Current-user profile, top items, and playlist follows |

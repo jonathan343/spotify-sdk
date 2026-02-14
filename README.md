@@ -150,6 +150,20 @@ audiobooks = client.audiobooks.get_several(["<id1>", "<id2>"])
 chapters = client.audiobooks.get_chapters("<id>", limit=10, offset=0)
 ```
 
+### Shows
+
+```python
+# Get a single show
+show = client.shows.get("show_id_123")
+show = client.shows.get("show_id_123", market="US")
+
+# Get show episodes with pagination
+episodes = client.shows.get_episodes("show_id_123", limit=10, offset=0)
+
+# Get current user's saved shows
+saved_shows = client.shows.get_saved(limit=10, offset=0)
+```
+
 ## Error Handling
 
 The SDK raises specific exceptions for different error types:

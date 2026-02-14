@@ -1,5 +1,5 @@
 ---
-icon: lucide/book
+icon: lucide/book-audio
 ---
 
 # Audiobooks
