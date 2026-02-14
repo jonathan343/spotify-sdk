@@ -26,6 +26,7 @@ nav = [
             "reference/services/albums.md",
             "reference/services/audiobooks.md",
             "reference/services/chapters.md",
+            "reference/services/episodes.md",
             "reference/services/artists.md",
             "reference/services/library.md",
             "reference/services/playlists.md",

@@ -40,6 +40,7 @@ attributes on the client instance.
 | [Albums](albums.md) | Album details, tracks, and new releases |
 | [Audiobooks](audiobooks.md) | Audiobook details and chapter lookups |
 | [Chapters](chapters.md) | Chapter details and bulk lookups |
+| [Episodes](episodes.md) | Episode details and saved-episode lookups |
 | [Artists](artists.md) | Artist profiles, albums, and top tracks |
 | [Library](library.md) | Save, remove, and check items in the user's library |
 | [Playlists](playlists.md) | Playlist details, items, and images |

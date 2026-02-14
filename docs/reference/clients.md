@@ -149,6 +149,7 @@ The main client exposes service objects as attributes:
 | `client.artists` | Artist operations |
 | `client.audiobooks` | Audiobook operations |
 | `client.chapters` | Chapter operations |
+| `client.episodes` | Episode operations |
 | `client.library` | Save, remove, and check library items |
 | `client.playlists` | Playlist operations |
 | `client.shows` | Show operations |
