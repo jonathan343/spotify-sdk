@@ -1,0 +1,5 @@
+{
+  "type": "feature",
+  "category": "shows",
+  "description": "Add `AsyncShowService`/`ShowService` with `get`, `get_episodes`, and `get_save` operations; add show/episode models, wire `client.shows`, and include async/sync test coverage. ([#51](https://github.com/jonathan343/spotify-sdk/pull/51))`"
+}
