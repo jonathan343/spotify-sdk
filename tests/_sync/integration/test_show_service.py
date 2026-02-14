@@ -15,6 +15,8 @@ from spotify_sdk._sync.auth import (
 )
 from spotify_sdk.auth import authorize_local
 
+# Public show ID from Spotify's Web API docs.
+DEFAULT_TEST_SHOW_ID = "6PwE1CIZsgfrhX6Bw96PUN"
 SHOW_SCOPES = ("user-library-read",)
 
 
@@ -42,27 +44,20 @@ class TestShowServiceIntegration:
         authorize_local(auth)
 
         with SpotifyClient(auth_provider=auth) as client:
-            saved_shows = client.shows.get_saved(limit=5, offset=0)
-            assert saved_shows.limit == 5
-            assert saved_shows.offset == 0
-
-            if not saved_shows.items:
-                pytest.skip(
-                    "No saved shows available for this account. "
-                    "Save at least one show to run this test."
-                )
-
-            show_id = saved_shows.items[0].show.id
-
-            show = client.shows.get(show_id)
-            assert show.id == show_id
+            show = client.shows.get(DEFAULT_TEST_SHOW_ID, market="US")
+            assert show.id == DEFAULT_TEST_SHOW_ID
             assert show.type_ == "show"
 
             episodes = client.shows.get_episodes(
-                show_id,
+                DEFAULT_TEST_SHOW_ID,
+                market="US",
                 limit=5,
                 offset=0,
             )
             assert episodes.limit == 5
             assert episodes.offset == 0
             assert all(item.type_ == "episode" for item in episodes.items)
+
+            saved_shows = client.shows.get_saved(limit=5, offset=0)
+            assert saved_shows.limit == 5
+            assert saved_shows.offset == 0
