@@ -76,3 +76,10 @@ class SavedShow(SpotifyModel):
 
     added_at: datetime
     show: SimplifiedShow
+
+
+class SavedEpisode(SpotifyModel):
+    """Episode saved in a user's library with timestamp metadata."""
+
+    added_at: datetime
+    episode: Episode

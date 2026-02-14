@@ -164,6 +164,18 @@ episodes = client.shows.get_episodes("show_id_123", limit=10, offset=0)
 saved_shows = client.shows.get_saved(limit=10, offset=0)
 ```
 
+### Episodes
+
+```python
+# Get a single episode
+episode = client.episodes.get("episode_id_123")
+episode = client.episodes.get("episode_id_123", market="US")
+
+# Get current user's saved episodes
+saved_episodes = client.episodes.get_saved(limit=10, offset=0)
+saved_episodes = client.episodes.get_saved(limit=10, offset=0, market="US")
+```
+
 ## Error Handling
 
 The SDK raises specific exceptions for different error types:
