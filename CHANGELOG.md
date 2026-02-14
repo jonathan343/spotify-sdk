@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.8.0
+
+### Features
+* Add `AsyncShowService`/`ShowService` with `get`, `get_episodes`, and `get_save` operations; add show/episode models, wire `client.shows`, and include async/sync test coverage. ([#52](https://github.com/jonathan343/spotify-sdk/pull/52))
+* Add `AsyncEpisodeService`/`EpisodeService` with `get` and `get_saved` operations; add `SavedEpisode` model support, wire `client.episodes`, and include async/sync unit + integration coverage. ([#53](https://github.com/jonathan343/spotify-sdk/pull/53))
+* Add `AsyncSearchService`/`SearchService` with typed catalog search support across albums, artists, playlists, tracks, shows, episodes, and audiobooks. ([#55](https://github.com/jonathan343/spotify-sdk/pull/55))
+
 ## v0.7.0
 
 ### Features
