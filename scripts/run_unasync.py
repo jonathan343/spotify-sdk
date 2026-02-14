@@ -23,6 +23,7 @@ ADDITIONAL_REPLACEMENTS = {
     "AsyncTrackService": "TrackService",
     "AsyncArtistService": "ArtistService",
     "AsyncPlaylistService": "PlaylistService",
+    "AsyncShowService": "ShowService",
     "AsyncChapterService": "ChapterService",
     "AsyncAudiobookService": "AudiobookService",
     "AsyncLibraryService": "LibraryService",

@@ -30,6 +30,7 @@ from .playlist import (
     PublicUser,
     SimplifiedPlaylist,
 )
+from .show import Episode, SavedShow, Show, SimplifiedEpisode, SimplifiedShow
 from .track import SimplifiedTrack, Track
 from .user import CurrentUser, ExplicitContent
 
@@ -77,4 +78,10 @@ __all__ = [
     "PlaylistTracksRef",
     "PublicUser",
     "SimplifiedPlaylist",
+    # Show
+    "Episode",
+    "SavedShow",
+    "Show",
+    "SimplifiedEpisode",
+    "SimplifiedShow",
 ]
