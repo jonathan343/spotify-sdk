@@ -30,6 +30,7 @@ from .playlist import (
     PublicUser,
     SimplifiedPlaylist,
 )
+from .search import SearchResult
 from .show import (
     Episode,
     SavedEpisode,
@@ -85,6 +86,8 @@ __all__ = [
     "PlaylistTracksRef",
     "PublicUser",
     "SimplifiedPlaylist",
+    # Search
+    "SearchResult",
     # Show
     "Episode",
     "SavedEpisode",
