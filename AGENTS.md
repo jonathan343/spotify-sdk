@@ -11,7 +11,8 @@
 ## Build, Test, and Development Commands
 ```bash
 uv sync                             # Install deps
-uv run pytest                       # Run all tests
+uv run pytest                       # Run default test suite (excludes integration)
+uv run pytest -m integration        # Run integration tests (requires creds + local auth)
 uv run ruff check .                 # Lint
 uv run ruff format --check --preview .  # Formatting check
 uv run pyright                      # Type checking
@@ -32,6 +33,10 @@ uv run zensical build --clean       # Build docs site
   in the built site.
 - Use clearly fake placeholder IDs in docs examples to avoid implying they are
   real, valid Spotify IDs.
+- Test naming conventions:
+  - Unit tests: `tests/_async/test_<service>_service.py`.
+  - Integration tests: `tests/_async/integration/test_<service>.py`.
+  - Sync tests are generated from async tests; do not edit sync tests directly.
 
 ## Testing Guidelines
 - Frameworks: `pytest`, `pytest-httpx`, `anyio`.
@@ -39,19 +44,39 @@ uv run zensical build --clean       # Build docs site
 - Test class names are descriptive (e.g., `TestAlbumServiceGet`).
 - Run `uv run pytest` after regenerating sync code to cover both variants.
 
+## Integration Test Guidelines
+- Integration tests are marked with `@pytest.mark.integration` and are excluded
+  from the default test command.
+- Run integration tests with `uv run pytest -m integration`.
+- Required env vars:
+  - `SPOTIFY_SDK_CLIENT_ID`
+  - `SPOTIFY_SDK_CLIENT_SECRET`
+  - `SPOTIFY_SDK_REDIRECT_URI`
+- Integration tests should skip cleanly when account state prerequisites are
+  not available (for example, no saved items).
+
 ## Commit & Pull Request Guidelines
 - Commit subjects are short, imperative sentences like `Add PlaylistService...`, `Fix docs build...`, or `Bump ruff...`.
 - Release commits follow `Release: vX.Y.Z (#NN)`.
 - PRs should include: a clear summary, tests run, and note if `run_unasync.py` was executed.
 - Include docs updates when public APIs or behavior change.
+- For user-facing behavior changes, add a release fragment under
+  `.changes/next-release/` with `type`, `category`, and `description`.
 
 ## Agent Workflow & Safety
 - Never edit `src/spotify_sdk/_sync/` or `tests/_sync/` directly; regenerate from `_async`.
 - Use `uv run` for tools and tests to match CI behavior.
 - Ask before destructive or external actions (publishing, emailing, `rm -rf`, etc.).
 - Keep changes scoped and explain any generated updates in the PR.
+- If async files are renamed or moved, regenerate sync code and remove stale
+  generated sync files when needed.
 
 ## Session Checklist
 - Skim `README.md` for context and `docs/` when touching public behavior.
 - If you changed `_async/` or `tests/_async/`, run `scripts/run_unasync.py` before tests.
 - Prefer updating docs alongside any public API or behavior change.
+- Before finishing, run:
+  - `uv run python scripts/run_unasync.py --check`
+  - `uv run ruff check .`
+  - `uv run ruff format --check --preview .`
+  - `uv run pyright`
