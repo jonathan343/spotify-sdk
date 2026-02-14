@@ -8,6 +8,7 @@ from spotify_sdk._async.services.albums import AsyncAlbumService
 from spotify_sdk._async.services.audiobooks import AsyncAudiobookService
 from spotify_sdk._async.services.episodes import AsyncEpisodeService
 from spotify_sdk._async.services.library import AsyncLibraryService
+from spotify_sdk._async.services.search import AsyncSearchService
 from spotify_sdk._async.services.shows import AsyncShowService
 from spotify_sdk._async.services.users import AsyncUserService
 
@@ -52,6 +53,11 @@ class TestSpotifyClientInit:
         client = AsyncSpotifyClient(access_token="test-token")
         assert hasattr(client, "episodes")
         assert isinstance(client.episodes, AsyncEpisodeService)
+
+    def test_has_search_service(self):
+        client = AsyncSpotifyClient(access_token="test-token")
+        assert hasattr(client, "search")
+        assert isinstance(client.search, AsyncSearchService)
 
     def test_has_shows_service(self):
         client = AsyncSpotifyClient(access_token="test-token")
