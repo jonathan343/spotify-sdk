@@ -13,6 +13,7 @@ from .services.chapters import AsyncChapterService
 from .services.episodes import AsyncEpisodeService
 from .services.library import AsyncLibraryService
 from .services.playlists import AsyncPlaylistService
+from .services.search import AsyncSearchService
 from .services.shows import AsyncShowService
 from .services.tracks import AsyncTrackService
 from .services.users import AsyncUserService
@@ -75,6 +76,7 @@ class AsyncSpotifyClient:
         self.chapters = AsyncChapterService(self._base_client)
         self.episodes = AsyncEpisodeService(self._base_client)
         self.library = AsyncLibraryService(self._base_client)
+        self.search = AsyncSearchService(self._base_client)
         self.shows = AsyncShowService(self._base_client)
         self.tracks = AsyncTrackService(self._base_client)
         self.artists = AsyncArtistService(self._base_client)

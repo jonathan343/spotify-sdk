@@ -1,0 +1,5 @@
+{
+  "type": "feature",
+  "category": "search",
+  "description": "Add `AsyncSearchService`/`SearchService` with typed catalog search support across albums, artists, playlists, tracks, shows, episodes, and audiobooks. ([#52](https://github.com/jonathan343/spotify-sdk/pull/52))"
+}

@@ -176,6 +176,17 @@ saved_episodes = client.episodes.get_saved(limit=10, offset=0)
 saved_episodes = client.episodes.get_saved(limit=10, offset=0, market="US")
 ```
 
+### Search
+
+```python
+results = client.search.search(
+    q="kind of blue",
+    types=["album", "artist"],
+    market="US",
+    limit=10,
+)
+```
+
 ## Error Handling
 
 The SDK raises specific exceptions for different error types:

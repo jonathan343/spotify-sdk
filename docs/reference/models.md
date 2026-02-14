@@ -41,6 +41,13 @@ Includes `SimplifiedAlbum`, `Album`, and `SavedAlbum`.
         members: true
         show_if_no_docstring: true
 
+## Search models
+
+::: spotify_sdk.models.search
+    options:
+        members: true
+        show_if_no_docstring: true
+
 ## Show and episode models
 
 ::: spotify_sdk.models.show
