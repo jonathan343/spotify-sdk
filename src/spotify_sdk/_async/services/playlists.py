@@ -156,6 +156,227 @@ class AsyncPlaylistService(AsyncBaseService):
         data = await self._get(f"/users/{id}/playlists", params=params)
         return Page[SimplifiedPlaylist].model_validate(data)
 
+    async def create(
+        self,
+        user_id: str,
+        name: str,
+        public: bool | None = None,
+        collaborative: bool | None = None,
+        description: str | None = None,
+    ) -> SimplifiedPlaylist:
+        """Create a playlist for a Spotify user.
+
+        Args:
+            user_id: The Spotify user ID that will own the playlist.
+            name: The playlist name.
+            public: Whether the playlist is public.
+            collaborative: Whether the playlist is collaborative.
+            description: Optional playlist description.
+
+        Returns:
+            The created playlist.
+
+        Raises:
+            ValueError: If user_id/name is empty, or collaborative is True
+                while public is not False.
+        """
+        if not user_id:
+            raise ValueError("user_id cannot be empty")
+        if not name:
+            raise ValueError("name cannot be empty")
+        if collaborative is True and public is not False:
+            raise ValueError("public must be False when collaborative is True")
+
+        payload: dict[str, str | bool] = {"name": name}
+        if public is not None:
+            payload["public"] = public
+        if collaborative is not None:
+            payload["collaborative"] = collaborative
+        if description is not None:
+            payload["description"] = description
+
+        data = await self._post(f"/users/{user_id}/playlists", json=payload)
+        return SimplifiedPlaylist.model_validate(data)
+
+    async def change_details(
+        self,
+        id: str,
+        name: str | None = None,
+        public: bool | None = None,
+        collaborative: bool | None = None,
+        description: str | None = None,
+    ) -> None:
+        """Change playlist metadata.
+
+        Args:
+            id: The Spotify playlist ID.
+            name: The new playlist name.
+            public: Whether the playlist should be public.
+            collaborative: Whether the playlist should be collaborative.
+            description: The new playlist description.
+
+        Raises:
+            ValueError: If id is empty, no fields are provided, or
+                collaborative and public are both True.
+        """
+        if not id:
+            raise ValueError("id cannot be empty")
+        if (
+            name is None
+            and public is None
+            and collaborative is None
+            and description is None
+        ):
+            raise ValueError("At least one field must be provided")
+        if collaborative is True and public is True:
+            raise ValueError("public and collaborative cannot both be True")
+
+        payload: dict[str, str | bool] = {}
+        if name is not None:
+            payload["name"] = name
+        if public is not None:
+            payload["public"] = public
+        if collaborative is not None:
+            payload["collaborative"] = collaborative
+        if description is not None:
+            payload["description"] = description
+
+        await self._put(f"/playlists/{id}", json=payload)
+
+    async def reorder_or_replace_items(
+        self,
+        id: str,
+        uris: list[str] | None = None,
+        range_start: int | None = None,
+        insert_before: int | None = None,
+        range_length: int | None = None,
+        snapshot_id: str | None = None,
+    ) -> str:
+        """Reorder existing items or replace all items in a playlist.
+
+        Args:
+            id: The Spotify playlist ID.
+            uris: Full replacement list of track/episode URIs.
+            range_start: Start index of items to move when reordering.
+            insert_before: Target index before which items are inserted.
+            range_length: Number of items to move (default 1).
+            snapshot_id: Playlist snapshot ID for optimistic concurrency.
+
+        Returns:
+            New playlist snapshot ID.
+
+        Raises:
+            ValueError: If id is empty, no valid mode is provided, or inputs
+                for replace/reorder are mixed.
+        """
+        if not id:
+            raise ValueError("id cannot be empty")
+
+        endpoint = f"/playlists/{id}/tracks"
+        if uris is not None:
+            if (
+                range_start is not None
+                or insert_before is not None
+                or range_length is not None
+                or snapshot_id is not None
+            ):
+                raise ValueError(
+                    "Replace mode cannot include reorder parameters"
+                )
+            self._validate_uris(uris)
+            payload: dict[str, object] = {"uris": uris}
+        else:
+            if range_start is None or insert_before is None:
+                raise ValueError(
+                    "range_start and insert_before are required for reorder"
+                )
+            payload = {
+                "range_start": range_start,
+                "insert_before": insert_before,
+            }
+            if range_length is not None:
+                payload["range_length"] = range_length
+            if snapshot_id is not None:
+                payload["snapshot_id"] = snapshot_id
+
+        data = await self._put(endpoint, json=payload)
+        return self._extract_snapshot_id(data, endpoint=endpoint)
+
+    async def add_items(
+        self, id: str, uris: list[str], position: int | None = None
+    ) -> str:
+        """Add one or more items to a playlist.
+
+        Args:
+            id: The Spotify playlist ID.
+            uris: Track or episode Spotify URIs to append.
+            position: Zero-based position where items should be inserted.
+
+        Returns:
+            New playlist snapshot ID.
+
+        Raises:
+            ValueError: If id is empty or uris is empty/contains empty values.
+        """
+        if not id:
+            raise ValueError("id cannot be empty")
+        self._validate_uris(uris)
+
+        endpoint = f"/playlists/{id}/tracks"
+        payload: dict[str, object] = {"uris": uris}
+        if position is not None:
+            payload["position"] = position
+
+        data = await self._post(endpoint, json=payload)
+        return self._extract_snapshot_id(data, endpoint=endpoint)
+
+    async def remove_items(
+        self,
+        id: str,
+        *,
+        uris: list[str] | None = None,
+        tracks: list[dict[str, str | list[int]]] | None = None,
+        snapshot_id: str | None = None,
+    ) -> str:
+        """Remove one or more items from a playlist.
+
+        Args:
+            id: The Spotify playlist ID.
+            uris: URIs to remove (removed wherever found).
+            tracks: Explicit track objects containing `uri` and optionally
+                `positions`.
+            snapshot_id: Playlist snapshot ID for optimistic concurrency.
+
+        Returns:
+            New playlist snapshot ID.
+
+        Raises:
+            ValueError: If id is empty, both/neither of uris/tracks are
+                provided, or track payloads are invalid.
+        """
+        if not id:
+            raise ValueError("id cannot be empty")
+        if (uris is None and tracks is None) or (
+            uris is not None and tracks is not None
+        ):
+            raise ValueError("Provide exactly one of uris or tracks")
+
+        if uris is not None:
+            self._validate_uris(uris)
+            tracks_payload: list[dict[str, str | list[int]]] = [
+                {"uri": uri} for uri in uris
+            ]
+        else:
+            tracks_payload = self._validate_tracks(tracks)
+
+        endpoint = f"/playlists/{id}/tracks"
+        payload: dict[str, object] = {"tracks": tracks_payload}
+        if snapshot_id is not None:
+            payload["snapshot_id"] = snapshot_id
+
+        data = await self._delete(endpoint, json=payload)
+        return self._extract_snapshot_id(data, endpoint=endpoint)
+
     async def get_cover_image(self, id: str) -> list[Image]:
         """Get the current image associated with a specific playlist.
 
@@ -173,3 +394,64 @@ class AsyncPlaylistService(AsyncBaseService):
             raise ValueError("id cannot be empty")
         data = await self._get(f"/playlists/{id}/images")
         return [Image.model_validate(image) for image in data]
+
+    async def upload_cover_image(
+        self, id: str, image_base64_jpeg: str
+    ) -> None:
+        """Upload a custom playlist cover image.
+
+        Args:
+            id: The Spotify playlist ID.
+            image_base64_jpeg: Base64-encoded JPEG image payload.
+
+        Raises:
+            ValueError: If id or image_base64_jpeg is empty.
+        """
+        if not id:
+            raise ValueError("id cannot be empty")
+        if not image_base64_jpeg:
+            raise ValueError("image_base64_jpeg cannot be empty")
+
+        await self._put(
+            f"/playlists/{id}/images",
+            headers={"Content-Type": "image/jpeg"},
+            content=image_base64_jpeg,
+        )
+
+    def _validate_uris(self, uris: list[str]) -> None:
+        if not uris:
+            raise ValueError("uris cannot be empty")
+        if any(not uri for uri in uris):
+            raise ValueError("uris cannot contain empty values")
+
+    def _validate_tracks(
+        self, tracks: list[dict[str, str | list[int]]] | None
+    ) -> list[dict[str, str | list[int]]]:
+        if not tracks:
+            raise ValueError("tracks cannot be empty")
+
+        for track in tracks:
+            uri = track.get("uri")
+            if not isinstance(uri, str) or not uri:
+                raise ValueError("Each track must include a non-empty uri")
+            positions = track.get("positions")
+            if positions is not None and (
+                not isinstance(positions, list)
+                or not all(isinstance(position, int) for position in positions)
+            ):
+                raise ValueError("positions must be a list of integers")
+
+        return tracks
+
+    def _extract_snapshot_id(self, data: object, endpoint: str) -> str:
+        if not isinstance(data, dict):
+            raise ValueError(
+                "Expected dict response from "
+                f"{endpoint}, got {type(data).__name__}"
+            )
+        snapshot_id = data.get("snapshot_id")
+        if not isinstance(snapshot_id, str):
+            raise ValueError(
+                f"Expected snapshot_id in response from {endpoint}"
+            )
+        return snapshot_id
