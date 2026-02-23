@@ -4,14 +4,11 @@ icon: lucide/download
 
 # Installation
 
-Get `spotify-sdk` installed and ready to use in your Python project.
-
 ## Prerequisites
 
 - Python 3.10 or higher
 
 Python version support follows the [official Python release cycle](https://devguide.python.org/versions/). We support all versions that have not reached end-of-life.
-
 
 ## Install the package
 
@@ -34,7 +31,7 @@ Python version support follows the [official Python release cycle](https://devgu
 
     ```bash
     python3 -m venv .venv
-    source .venv/bin/activate
+    source .venv/bin/activate  # Windows: .venv\Scripts\activate
     pip install spotify-sdk
     ```
 
@@ -42,21 +39,11 @@ Python version support follows the [official Python release cycle](https://devgu
 
 Confirm the package is installed correctly:
 
-```python
-import spotify_sdk
-print(spotify_sdk.__version__)
+```bash
+python -c "import spotify_sdk; print(spotify_sdk.__version__)"
 ```
 
 ## Next steps
 
-<div class="grid cards" markdown>
-
-- :octicons-rocket-16: __Quickstart__
-
-    ---
-
-    Learn how to authenticate and make your first API call.
-
-    [:octicons-arrow-right-24: Get started](quickstart.md)
-
-</div>
+- [:octicons-arrow-right-24: Quickstart](quickstart.md) — authenticate and make your first API call
+- [:octicons-arrow-right-24: Authentication](reference/auth.md) — choose a credential flow for your use case
