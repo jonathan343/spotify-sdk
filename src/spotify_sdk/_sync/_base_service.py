@@ -30,6 +30,8 @@ class BaseService:
         **options: Any,
     ) -> Any:
         """Make a POST request."""
+        if json is None:
+            return self._client.request("POST", path, **options)
         return self._client.request("POST", path, json=json, **options)
 
     def _put(
@@ -39,6 +41,8 @@ class BaseService:
         **options: Any,
     ) -> Any:
         """Make a PUT request."""
+        if json is None:
+            return self._client.request("PUT", path, **options)
         return self._client.request("PUT", path, json=json, **options)
 
     def _delete(

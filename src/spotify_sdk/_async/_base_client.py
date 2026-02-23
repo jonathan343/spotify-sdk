@@ -93,6 +93,8 @@ class AsyncBaseClient:
         path: str,
         params: dict[str, Any] | None = None,
         json: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+        content: str | bytes | None = None,
         timeout: float | None = None,  # noqa: ASYNC109
         max_retries: int | None = None,
     ) -> Any:
@@ -103,6 +105,8 @@ class AsyncBaseClient:
             path: API endpoint path.
             params: Query parameters.
             json: JSON body for POST/PUT requests.
+            headers: Optional headers to merge with default headers.
+            content: Raw request body.
             timeout: Request timeout override.
             max_retries: Max retries override.
 
@@ -118,13 +122,17 @@ class AsyncBaseClient:
         for attempt in range(retries + 1):
             try:
                 access_token = await self._get_access_token()
+                request_headers = self._default_headers(access_token)
+                if headers:
+                    request_headers.update(headers)
                 response = await self._http_client.request(
                     method=method,
                     url=path,
                     params=self._clean_params(params),
                     json=json,
+                    content=content,
                     timeout=timeout,
-                    headers=self._default_headers(access_token),
+                    headers=request_headers,
                 )
                 return self._handle_response(response)
 

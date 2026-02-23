@@ -32,6 +32,8 @@ class AsyncBaseService:
         **options: Any,
     ) -> Any:
         """Make a POST request."""
+        if json is None:
+            return await self._client.request("POST", path, **options)
         return await self._client.request("POST", path, json=json, **options)
 
     async def _put(
@@ -41,6 +43,8 @@ class AsyncBaseService:
         **options: Any,
     ) -> Any:
         """Make a PUT request."""
+        if json is None:
+            return await self._client.request("PUT", path, **options)
         return await self._client.request("PUT", path, json=json, **options)
 
     async def _delete(
