@@ -13,6 +13,92 @@ from spotify_sdk._async.auth import AsyncAuthorizationCode, TokenInfo
 
 
 class TestAuthHelpers:
+    def test_authorization_code_has_authorize_local_method(self, monkeypatch):
+        calls: list[object] = []
+
+        def fake_authorize_local(
+            auth,
+            *,
+            state: str | None = None,
+            show_dialog: bool = False,
+            timeout: float = 300.0,
+            open_browser: bool = True,
+            authorization_url_handler=None,
+        ) -> TokenInfo:
+            del state
+            del show_dialog
+            del timeout
+            del open_browser
+            del authorization_url_handler
+            calls.append(auth)
+            return TokenInfo(
+                access_token="token",
+                expires_at=1_700_000_000.0,
+                refresh_token="refresh",
+            )
+
+        monkeypatch.setattr(
+            public_auth_module,
+            "_authorize_local_sync_impl",
+            fake_authorize_local,
+        )
+
+        auth = public_auth_module.AuthorizationCode(
+            client_id="client-id",
+            client_secret="client-secret",
+            redirect_uri="http://127.0.0.1:8080/callback",
+        )
+
+        token_info = auth.authorize_local()
+
+        assert token_info.access_token == "token"
+        assert calls == [auth]
+
+    @pytest.mark.anyio
+    async def test_async_authorization_code_has_authorize_local_method(
+        self,
+        monkeypatch,
+    ):
+        calls: list[object] = []
+
+        async def fake_async_authorize_local(
+            auth,
+            *,
+            state: str | None = None,
+            show_dialog: bool = False,
+            timeout: float = 300.0,
+            open_browser: bool = True,
+            authorization_url_handler=None,
+        ) -> TokenInfo:
+            del state
+            del show_dialog
+            del timeout
+            del open_browser
+            del authorization_url_handler
+            calls.append(auth)
+            return TokenInfo(
+                access_token="token",
+                expires_at=1_700_000_000.0,
+                refresh_token="refresh",
+            )
+
+        monkeypatch.setattr(
+            public_auth_module,
+            "async_authorize_local",
+            fake_async_authorize_local,
+        )
+
+        auth = public_auth_module.AsyncAuthorizationCode(
+            client_id="client-id",
+            client_secret="client-secret",
+            redirect_uri="http://127.0.0.1:8080/callback",
+        )
+
+        token_info = await auth.authorize_local()
+
+        assert token_info.access_token == "token"
+        assert calls == [auth]
+
     @pytest.mark.anyio
     async def test_authorize_local_in_async_context_raises(self):
         auth = AsyncAuthorizationCode(

@@ -89,29 +89,33 @@ tokens automatically.
 
 ### Local Dev Helper (No Copy/Paste)
 
-For local CLI workflows, use `authorize_local(...)` to open the browser,
+For local CLI workflows, use `auth.authorize_local(...)` to open the browser,
 capture the loopback callback automatically, and exchange the code.
 
 ```python
-from spotify_sdk.auth import AuthorizationCode, authorize_local
+from spotify_sdk.auth import AuthorizationCode
 
 auth = AuthorizationCode(scope="user-read-private")
-token_info = authorize_local(auth)
+token_info = auth.authorize_local()
 print(token_info.refresh_token)
 ```
 
-`authorize_local` requires a loopback redirect URI
+`auth.authorize_local(...)` requires a loopback redirect URI
 (`http://127.0.0.1:<port>/...` or `http://localhost:<port>/...`).
 
-For async code (notebooks, async CLIs), use `async_authorize_local(...)`:
+For async code (notebooks, async CLIs), use
+`await auth.authorize_local(...)`:
 
 ```python
-from spotify_sdk.auth import AsyncAuthorizationCode, async_authorize_local
+from spotify_sdk.auth import AsyncAuthorizationCode
 
 auth = AsyncAuthorizationCode(scope="user-read-private")
-token_info = await async_authorize_local(auth)
+token_info = await auth.authorize_local()
 print(token_info.refresh_token)
 ```
+
+`authorize_local(auth)` and `async_authorize_local(auth)` remain available as
+function helpers for backward compatibility.
 
 ## Environment Variables
 
