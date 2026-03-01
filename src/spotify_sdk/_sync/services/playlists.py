@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ...models import Image, Page, Playlist, PlaylistTrack, SimplifiedPlaylist
+from ...models import Image, Page, Playlist, PlaylistItem, SimplifiedPlaylist
 from .._base_service import BaseService
 
 
@@ -60,7 +60,7 @@ class PlaylistService(BaseService):
         fields: str | None = None,
         limit: int | None = None,
         offset: int | None = None,
-    ) -> Page[PlaylistTrack]:
+    ) -> Page[PlaylistItem]:
         """Get full details of the items of a playlist owned by a Spotify user.
 
         Args:
@@ -103,8 +103,8 @@ class PlaylistService(BaseService):
         if offset is not None:
             params["offset"] = offset
 
-        data = self._get(f"/playlists/{id}/tracks", params=params)
-        return Page[PlaylistTrack].model_validate(data)
+        data = self._get(f"/playlists/{id}/items", params=params)
+        return Page[PlaylistItem].model_validate(data)
 
     def get_for_current_user(
         self, limit: int | None = None, offset: int | None = None
@@ -272,7 +272,7 @@ class PlaylistService(BaseService):
         if not id:
             raise ValueError("id cannot be empty")
 
-        endpoint = f"/playlists/{id}/tracks"
+        endpoint = f"/playlists/{id}/items"
         if uris is not None:
             if (
                 range_start is not None
@@ -322,7 +322,7 @@ class PlaylistService(BaseService):
             raise ValueError("id cannot be empty")
         self._validate_uris(uris)
 
-        endpoint = f"/playlists/{id}/tracks"
+        endpoint = f"/playlists/{id}/items"
         payload: dict[str, object] = {"uris": uris}
         if position is not None:
             payload["position"] = position
@@ -335,7 +335,7 @@ class PlaylistService(BaseService):
         id: str,
         *,
         uris: list[str] | None = None,
-        tracks: list[dict[str, str | list[int]]] | None = None,
+        items: list[dict[str, str | list[int]]] | None = None,
         snapshot_id: str | None = None,
     ) -> str:
         """Remove one or more items from a playlist.
@@ -343,34 +343,33 @@ class PlaylistService(BaseService):
         Args:
             id: The Spotify playlist ID.
             uris: URIs to remove (removed wherever found).
-            tracks: Explicit track objects containing `uri` and optionally
-                `positions`.
+            items: Explicit item objects containing `uri`.
             snapshot_id: Playlist snapshot ID for optimistic concurrency.
 
         Returns:
             New playlist snapshot ID.
 
         Raises:
-            ValueError: If id is empty, both/neither of uris/tracks are
-                provided, or track payloads are invalid.
+            ValueError: If id is empty, both/neither of uris/items are
+                provided, or item payloads are invalid.
         """
         if not id:
             raise ValueError("id cannot be empty")
-        if (uris is None and tracks is None) or (
-            uris is not None and tracks is not None
+        if (uris is None and items is None) or (
+            uris is not None and items is not None
         ):
-            raise ValueError("Provide exactly one of uris or tracks")
+            raise ValueError("Provide exactly one of uris or items")
 
         if uris is not None:
             self._validate_uris(uris)
-            tracks_payload: list[dict[str, str | list[int]]] = [
+            items_payload: list[dict[str, str | list[int]]] = [
                 {"uri": uri} for uri in uris
             ]
         else:
-            tracks_payload = self._validate_tracks(tracks)
+            items_payload = self._validate_items(items)
 
-        endpoint = f"/playlists/{id}/tracks"
-        payload: dict[str, object] = {"tracks": tracks_payload}
+        endpoint = f"/playlists/{id}/items"
+        payload: dict[str, object] = {"items": items_payload}
         if snapshot_id is not None:
             payload["snapshot_id"] = snapshot_id
 
@@ -422,24 +421,18 @@ class PlaylistService(BaseService):
         if any(not uri for uri in uris):
             raise ValueError("uris cannot contain empty values")
 
-    def _validate_tracks(
-        self, tracks: list[dict[str, str | list[int]]] | None
+    def _validate_items(
+        self, items: list[dict[str, str | list[int]]] | None
     ) -> list[dict[str, str | list[int]]]:
-        if not tracks:
-            raise ValueError("tracks cannot be empty")
+        if not items:
+            raise ValueError("items cannot be empty")
 
-        for track in tracks:
-            uri = track.get("uri")
+        for item in items:
+            uri = item.get("uri")
             if not isinstance(uri, str) or not uri:
-                raise ValueError("Each track must include a non-empty uri")
-            positions = track.get("positions")
-            if positions is not None and (
-                not isinstance(positions, list)
-                or not all(isinstance(position, int) for position in positions)
-            ):
-                raise ValueError("positions must be a list of integers")
+                raise ValueError("Each item must include a non-empty uri")
 
-        return tracks
+        return items
 
     def _extract_snapshot_id(self, data: object, endpoint: str) -> str:
         if not isinstance(data, dict):

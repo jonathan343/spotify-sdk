@@ -36,8 +36,8 @@ SIMPLIFIED_PLAYLIST_RESPONSE = {
     },
     "public": False,
     "snapshot_id": "snapshot-123",
-    "tracks": {
-        "href": "https://api.spotify.com/v1/playlists/playlist123/tracks",
+    "items": {
+        "href": "https://api.spotify.com/v1/playlists/playlist123/items",
         "total": 0,
     },
     "type": "playlist",
@@ -163,7 +163,7 @@ class TestPlaylistServiceReorderOrReplaceItems:
     def test_replace_items(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             method="PUT",
-            url="https://api.spotify.com/v1/playlists/playlist123/tracks",
+            url="https://api.spotify.com/v1/playlists/playlist123/items",
             json=SNAPSHOT_RESPONSE,
         )
 
@@ -188,7 +188,7 @@ class TestPlaylistServiceReorderOrReplaceItems:
     def test_reorder_items(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             method="PUT",
-            url="https://api.spotify.com/v1/playlists/playlist123/tracks",
+            url="https://api.spotify.com/v1/playlists/playlist123/items",
             json=SNAPSHOT_RESPONSE,
         )
 
@@ -246,7 +246,7 @@ class TestPlaylistServiceAddItems:
     def test_add_items(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             method="POST",
-            url="https://api.spotify.com/v1/playlists/playlist123/tracks",
+            url="https://api.spotify.com/v1/playlists/playlist123/items",
             json=SNAPSHOT_RESPONSE,
         )
 
@@ -285,7 +285,7 @@ class TestPlaylistServiceRemoveItems:
     def test_remove_items_by_uris(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             method="DELETE",
-            url="https://api.spotify.com/v1/playlists/playlist123/tracks",
+            url="https://api.spotify.com/v1/playlists/playlist123/items",
             json=SNAPSHOT_RESPONSE,
         )
 
@@ -299,31 +299,31 @@ class TestPlaylistServiceRemoveItems:
         assert snapshot_id == "snapshot-456"
         requests = httpx_mock.get_requests()
         assert json.loads(requests[0].content.decode()) == {
-            "tracks": [
+            "items": [
                 {"uri": "spotify:track:track123"},
                 {"uri": "spotify:episode:episode456"},
             ],
             "snapshot_id": "snapshot-123",
         }
 
-    def test_remove_items_by_tracks(self, httpx_mock: HTTPXMock):
+    def test_remove_items_by_items(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             method="DELETE",
-            url="https://api.spotify.com/v1/playlists/playlist123/tracks",
+            url="https://api.spotify.com/v1/playlists/playlist123/items",
             json=SNAPSHOT_RESPONSE,
         )
 
         with SpotifyClient(access_token="test-token") as client:
             snapshot_id = client.playlists.remove_items(
                 "playlist123",
-                tracks=[{"uri": "spotify:track:track123", "positions": [2]}],
+                items=[{"uri": "spotify:track:track123"}],
             )
 
         assert snapshot_id == "snapshot-456"
         requests = httpx_mock.get_requests()
         assert json.loads(requests[0].content.decode()) == {
-            "tracks": [
-                {"uri": "spotify:track:track123", "positions": [2]},
+            "items": [
+                {"uri": "spotify:track:track123"},
             ]
         }
 
@@ -338,44 +338,28 @@ class TestPlaylistServiceRemoveItems:
     def test_remove_items_requires_exactly_one_payload(self):
         with SpotifyClient(access_token="test-token") as client:
             with pytest.raises(
-                ValueError, match="Provide exactly one of uris or tracks"
+                ValueError, match="Provide exactly one of uris or items"
             ):
                 client.playlists.remove_items("playlist123")
 
             with pytest.raises(
-                ValueError, match="Provide exactly one of uris or tracks"
+                ValueError, match="Provide exactly one of uris or items"
             ):
                 client.playlists.remove_items(
                     "playlist123",
                     uris=["spotify:track:track123"],
-                    tracks=[{"uri": "spotify:track:track456"}],
+                    items=[{"uri": "spotify:track:track456"}],
                 )
 
     def test_remove_items_track_missing_uri_raises_error(self):
         with SpotifyClient(access_token="test-token") as client:
             with pytest.raises(
                 ValueError,
-                match="Each track must include a non-empty uri",
+                match="Each item must include a non-empty uri",
             ):
                 client.playlists.remove_items(
                     "playlist123",
-                    tracks=[{"positions": [1]}],  # type: ignore[list-item]
-                )
-
-    def test_remove_items_track_invalid_positions_raises_error(self):
-        with SpotifyClient(access_token="test-token") as client:
-            with pytest.raises(
-                ValueError,
-                match="positions must be a list of integers",
-            ):
-                client.playlists.remove_items(
-                    "playlist123",
-                    tracks=[
-                        {
-                            "uri": "spotify:track:track123",
-                            "positions": "bad",  # type: ignore[dict-item]
-                        }
-                    ],
+                    items=[{"positions": [1]}],  # type: ignore[list-item]
                 )
 
 
