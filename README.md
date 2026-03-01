@@ -59,7 +59,7 @@ client = SpotifyClient.from_client_credentials(
 
 ```python
 # Authorization code (user-scoped endpoints)
-from spotify_sdk.auth import AuthorizationCode, FileTokenCache, authorize_local
+from spotify_sdk.auth import AuthorizationCode, FileTokenCache
 
 auth = AuthorizationCode(
     client_id="your-client-id",
@@ -70,7 +70,7 @@ auth = AuthorizationCode(
 )
 
 # Local helper: opens browser and captures the callback automatically
-authorize_local(auth)
+auth.authorize_local()
 
 client = SpotifyClient(auth_provider=auth)
 ```

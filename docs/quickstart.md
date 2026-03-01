@@ -87,12 +87,12 @@ client = SpotifyClient.from_client_credentials(
 ### Authorization Code
 
 Use an authorization code provider for user-scoped endpoints. For local
-scripts, `authorize_local` opens the browser and captures the callback
+scripts, `auth.authorize_local()` opens the browser and captures the callback
 automatically:
 
 ```python
 from spotify_sdk import SpotifyClient
-from spotify_sdk.auth import AuthorizationCode, FileTokenCache, authorize_local
+from spotify_sdk.auth import AuthorizationCode, FileTokenCache
 
 auth = AuthorizationCode(
     client_id="your-client-id",
@@ -102,13 +102,13 @@ auth = AuthorizationCode(
     token_cache=FileTokenCache(".cache/spotify-sdk/token.json"),
 )
 
-authorize_local(auth)
+auth.authorize_local()
 
 with SpotifyClient(auth_provider=auth) as client:
     ...
 ```
 
-`authorize_local(...)` requires a loopback redirect URI
+`auth.authorize_local(...)` requires a loopback redirect URI
 (`http://127.0.0.1:<port>/...` or `http://localhost:<port>/...`).
 
 See the [auth reference](reference/auth.md#authorization-code) for the full

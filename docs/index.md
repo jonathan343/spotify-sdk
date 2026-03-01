@@ -85,8 +85,8 @@ can build apps against Spotify without managing raw HTTP or JSON.
 
     ---
 
-    Client credentials, authorization code, `authorize_local`, and pluggable
-    token caching.
+    Client credentials, authorization code, `auth.authorize_local()`, and
+    pluggable token caching.
 
     [:octicons-arrow-right-24: Auth guide](reference/auth.md)
 
