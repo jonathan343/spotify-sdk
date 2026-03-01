@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.9.1
+
+### Dependencies
+* Add `sniffio` as a runtime dependency. ([#66](https://github.com/jonathan343/spotify-sdk/pull/66))
+
 ## v0.9.0
 
 ### Features
