@@ -1,0 +1,15 @@
+{
+  "schema-version": "0.2",
+  "changes": [
+    {
+      "type": "feature",
+      "category": "auth",
+      "description": "Added `authorize_local()` instance methods on `AuthorizationCode` and `AsyncAuthorizationCode` in `spotify_sdk.auth` so local loopback auth can be started directly from the auth object (`auth.authorize_local()` / `await auth.authorize_local()`) while keeping function helpers for backward compatibility. ([#63](https://github.com/jonathan343/spotify-sdk/pull/63))"
+    },
+    {
+      "type": "feature",
+      "category": "playlists",
+      "description": "Added full playlist mutation API support (`create`, `change_details`, `reorder_or_replace_items`, `add_items`, `remove_items`, and `upload_cover_image`). ([#60](https://github.com/jonathan343/spotify-sdk/pull/60))"
+    }
+  ]
+}
