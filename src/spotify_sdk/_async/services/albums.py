@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ...models import Album, Page, SavedAlbum, SimplifiedAlbum, SimplifiedTrack
+from ...models import Album, Page, SavedAlbum, SimplifiedTrack
 from .._base_service import AsyncBaseService
 
 
@@ -27,32 +27,6 @@ class AsyncAlbumService(AsyncBaseService):
         params = {"market": market} if market else None
         data = await self._get(f"/albums/{id}", params=params)
         return Album.model_validate(data)
-
-    async def get_several(
-        self,
-        ids: list[str],
-        market: str | None = None,
-    ) -> list[Album]:
-        """Get multiple albums by IDs.
-
-        Args:
-            ids: List of Spotify album IDs. The Spotify API enforces a
-                maximum of 20 IDs per request.
-            market: An ISO 3166-1 alpha-2 country code for track relinking.
-
-        Returns:
-            List of albums.
-
-        Raises:
-            ValueError: If ids is empty.
-        """
-        if not ids:
-            raise ValueError("ids cannot be empty")
-        params: dict[str, str] = {"ids": ",".join(ids)}
-        if market:
-            params["market"] = market
-        data = await self._get("/albums", params=params)
-        return [Album.model_validate(a) for a in data["albums"]]
 
     async def get_tracks(
         self,
@@ -81,22 +55,6 @@ class AsyncAlbumService(AsyncBaseService):
         data = await self._get(f"/albums/{id}/tracks", params=params)
         return Page[SimplifiedTrack].model_validate(data)
 
-    async def get_new_releases(
-        self, limit: int = 20, offset: int = 0
-    ) -> Page[SimplifiedAlbum]:
-        """Get a list of new album releases on Spotify.
-
-        Args:
-            limit: Maximum number of albums to return (1-50, default 20).
-            offset: Index of the first album to return.
-
-        Returns:
-            Paginated list of new album releases.
-        """
-        params = {"limit": limit, "offset": offset}
-        data = await self._get("/browse/new-releases", params=params)
-        return Page[SimplifiedAlbum].model_validate(data["albums"])
-
     async def get_saved(
         self,
         limit: int = 20,
@@ -118,26 +76,3 @@ class AsyncAlbumService(AsyncBaseService):
             params["market"] = market
         data = await self._get("/me/albums", params=params)
         return Page[SavedAlbum].model_validate(data)
-
-    async def check_saved(self, ids: list[str]) -> list[bool]:
-        """Check whether albums are saved in the current user's library.
-
-        Args:
-            ids: Spotify album IDs to check.
-
-        Returns:
-            A list of booleans aligned to input ids.
-
-        Raises:
-            ValueError: If ids is empty or the response shape is invalid.
-        """
-        if not ids:
-            raise ValueError("ids cannot be empty")
-        data = await self._get(
-            "/me/albums/contains",
-            params={"ids": ",".join(ids)},
-        )
-        return self._validate_bool_list_response(
-            data,
-            endpoint="/me/albums/contains",
-        )

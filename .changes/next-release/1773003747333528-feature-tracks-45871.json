@@ -1,0 +1,5 @@
+{
+  "type": "feature",
+  "category": "tracks",
+  "description": "Added `tracks.get_saved()` for Spotify's saved tracks endpoint (`GET /me/tracks`), with typed saved-track models in both async and sync clients. ([#71](https://github.com/jonathan343/spotify-sdk/pull/71))"
+}

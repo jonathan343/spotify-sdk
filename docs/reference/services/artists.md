@@ -11,9 +11,7 @@ Artist operations live under `client.artists`.
 | Method | Returns | Description |
 | --- | --- | --- |
 | `get(id)` | `Artist` | Fetch an artist by Spotify ID |
-| `get_several(ids)` | `list[Artist]` | Fetch multiple artists (max 50 IDs) |
 | `get_albums(id, include_groups=None, market=None, limit=None, offset=None)` | `Page[SimplifiedAlbum]` | Fetch albums for an artist |
-| `get_top_tracks(id, market=None)` | `list[Track]` | Fetch an artist's top tracks |
 
 !!! tip "Filtering album types"
     `include_groups` accepts the values `album`, `single`, `appears_on`, and

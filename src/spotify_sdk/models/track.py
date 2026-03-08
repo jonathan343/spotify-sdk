@@ -1,5 +1,6 @@
 """Track models."""
 
+from datetime import datetime
 from typing import Literal
 
 from pydantic import Field
@@ -38,3 +39,10 @@ class Track(SimplifiedTrack):
     album: SimplifiedAlbum
     external_ids: ExternalIds
     popularity: int
+
+
+class SavedTrack(SpotifyModel):
+    """Track saved in a user's library with timestamp metadata."""
+
+    added_at: datetime
+    track: Track

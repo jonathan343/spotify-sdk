@@ -38,7 +38,7 @@ class SearchService(BaseService):
             q: Search query keywords and filters.
             types: Resource types to search.
             market: An ISO 3166-1 alpha-2 country code.
-            limit: Maximum number of results per type (0-50, default 5).
+            limit: Maximum number of results per type (0-10, default 5).
             offset: Index of the first result to return.
             include_external: Whether to include externally hosted audio.
 

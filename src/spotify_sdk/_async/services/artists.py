@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal, get_args
 
-from ...models import Artist, Page, SimplifiedAlbum, Track
+from ...models import Artist, Page, SimplifiedAlbum
 from .._base_service import AsyncBaseService
 
 IncludeGroup = Literal["album", "single", "appears_on", "compilation"]
@@ -30,23 +30,6 @@ class AsyncArtistService(AsyncBaseService):
             raise ValueError("id cannot be empty")
         data = await self._get(f"/artists/{id}")
         return Artist.model_validate(data)
-
-    async def get_several(self, ids: list[str]) -> list[Artist]:
-        """Get multiple artists by IDs.
-
-        Args:
-            ids: List of Spotify artist IDs. The Spotify API enforces a maximum of 50 IDs per request.
-
-        Returns:
-            The requested artists.
-
-        Raises:
-            ValueError: If ids is empty.
-        """
-        if not ids:
-            raise ValueError("ids cannot be empty")
-        data = await self._get("/artists", params={"ids": ",".join(ids)})
-        return [Artist.model_validate(a) for a in data["artists"]]
 
     async def get_albums(
         self,
@@ -90,26 +73,3 @@ class AsyncArtistService(AsyncBaseService):
             params["offset"] = offset
         data = await self._get(f"/artists/{id}/albums", params=params)
         return Page[SimplifiedAlbum].model_validate(data)
-
-    async def get_top_tracks(
-        self, id: str, market: str | None = None
-    ) -> list[Track]:
-        """Get an artist's top tracks for a given market.
-
-        Args:
-            id: The Spotify ID of the artist.
-            market: An ISO 3166-1 alpha-2 country code for the requested content.
-
-        Returns:
-            The top tracks for the artist.
-
-        Raises:
-            ValueError: If id is empty.
-        """
-        if not id:
-            raise ValueError("id cannot be empty")
-        params: dict[str, str] = {}
-        if market is not None:
-            params["market"] = market
-        data = await self._get(f"/artists/{id}/top-tracks", params=params)
-        return [Track.model_validate(a) for a in data["tracks"]]

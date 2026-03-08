@@ -11,14 +11,18 @@ Audiobook operations live under `client.audiobooks`.
 | Method | Returns | Description |
 | --- | --- | --- |
 | `get(id, market=None)` | `Audiobook` | Fetch a single audiobook by Spotify ID |
-| `get_several(ids, market=None)` | `list[Audiobook]` | Fetch multiple audiobooks (max 50 IDs) |
 | `get_chapters(id, market=None, limit=20, offset=0)` | `Page[SimplifiedChapter]` | Fetch chapters for an audiobook |
+| `get_saved(limit=20, offset=0)` | `Page[SavedAudiobook]` | Fetch current user's saved audiobooks |
 
 !!! tip "Market parameter"
     Pass an ISO 3166-1 alpha-2 country code to `market` to ensure availability.
 
 !!! note "Limited availability"
     Audiobooks are currently available only in select markets.
+
+!!! tip "Required scopes"
+    Spotify requires user-scoped access tokens for saved audiobook access.
+    Ensure your auth flow requests `user-library-read` when using `get_saved`.
 
 ## Examples
 
@@ -30,6 +34,7 @@ Audiobook operations live under `client.audiobooks`.
     with SpotifyClient(access_token="your-access-token") as client:
         audiobook = client.audiobooks.get("7iHfbu1YPACw6oZPAFJtqe")
         chapters = client.audiobooks.get_chapters(audiobook.id, limit=10)
+        saved_audiobooks = client.audiobooks.get_saved(limit=10)
     ```
 
 === "Async"
@@ -42,6 +47,7 @@ Audiobook operations live under `client.audiobooks`.
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             audiobook = await client.audiobooks.get("7iHfbu1YPACw6oZPAFJtqe")
             chapters = await client.audiobooks.get_chapters(audiobook.id, limit=10)
+            saved_audiobooks = await client.audiobooks.get_saved(limit=10)
 
     asyncio.run(main())
     ```

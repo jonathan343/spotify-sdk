@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ...models import Track
+from ...models import Page, SavedTrack, Track
 from .._base_service import BaseService
 
 
@@ -28,28 +28,24 @@ class TrackService(BaseService):
         data = self._get(f"/tracks/{id}", params=params)
         return Track.model_validate(data)
 
-    def get_several(
+    def get_saved(
         self,
-        ids: list[str],
+        limit: int = 20,
+        offset: int = 0,
         market: str | None = None,
-    ) -> list[Track]:
-        """Get multiple tracks by IDs.
+    ) -> Page[SavedTrack]:
+        """Get tracks saved in the current user's library.
 
         Args:
-            ids: List of Spotify track IDs. The Spotify API enforces a
-                maximum of 20 IDs per request.
-            market: An ISO 3166-1 alpha-2 country code for track relinking.
+            limit: Maximum number of tracks to return (1-50, default 20).
+            offset: Index of the first track to return.
+            market: An ISO 3166-1 alpha-2 country code.
 
         Returns:
-            List of tracks.
-
-        Raises:
-            ValueError: If ids is empty.
+            Paginated list of saved tracks.
         """
-        if not ids:
-            raise ValueError("ids cannot be empty")
-        params: dict[str, str] = {"ids": ",".join(ids)}
-        if market:
+        params: dict[str, int | str] = {"limit": limit, "offset": offset}
+        if market is not None:
             params["market"] = market
-        data = self._get("/tracks", params=params)
-        return [Track.model_validate(a) for a in data["tracks"]]
+        data = self._get("/me/tracks", params=params)
+        return Page[SavedTrack].model_validate(data)
