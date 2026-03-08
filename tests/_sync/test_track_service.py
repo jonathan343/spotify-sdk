@@ -3,7 +3,7 @@
 from pytest_httpx import HTTPXMock
 
 from spotify_sdk import SpotifyClient
-from spotify_sdk.models import Track
+from spotify_sdk.models import Page, SavedTrack, Track
 
 TRACK_RESPONSE = {
     "album": {
@@ -61,6 +61,11 @@ TRACK_RESPONSE = {
     "is_local": False,
 }
 
+SAVED_TRACK_RESPONSE = {
+    "added_at": "2024-01-15T12:34:56Z",
+    "track": TRACK_RESPONSE,
+}
+
 
 class TestTrackServiceGet:
     def test_get_track(self, httpx_mock: HTTPXMock):
@@ -77,26 +82,54 @@ class TestTrackServiceGet:
         assert track.name == "Wesley's Theory"
 
 
-class TestTrackServiceGetSeveral:
-    def test_get_several_tracks(self, httpx_mock: HTTPXMock):
+class TestTrackServiceGetSaved:
+    def test_get_saved(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
-            url="https://api.spotify.com/v1/tracks?ids=789%2C012",
+            url="https://api.spotify.com/v1/me/tracks?limit=20&offset=0",
             json={
-                "tracks": [
-                    TRACK_RESPONSE,
-                    {
-                        **TRACK_RESPONSE,
-                        "id": "012",
-                        "name": "For Free?",
-                    },
-                ]
+                "href": "https://api.spotify.com/v1/me/tracks",
+                "limit": 20,
+                "next": None,
+                "offset": 0,
+                "previous": None,
+                "total": 1,
+                "items": [SAVED_TRACK_RESPONSE],
             },
         )
 
         with SpotifyClient(access_token="test-token") as client:
-            tracks = client.tracks.get_several(["789", "012"])
+            page = client.tracks.get_saved()
 
-        assert len(tracks) == 2
-        assert all(isinstance(t, Track) for t in tracks)
-        assert tracks[0].id == "789"
-        assert tracks[1].id == "012"
+        assert isinstance(page, Page)
+        assert page.total == 1
+        assert len(page.items) == 1
+        assert isinstance(page.items[0], SavedTrack)
+        assert page.items[0].track.id == "789"
+
+    def test_get_saved_with_market_and_pagination(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(
+            url=(
+                "https://api.spotify.com/v1/me/tracks"
+                "?limit=10&offset=5&market=US"
+            ),
+            json={
+                "href": "https://api.spotify.com/v1/me/tracks",
+                "limit": 10,
+                "next": None,
+                "offset": 5,
+                "previous": None,
+                "total": 1,
+                "items": [SAVED_TRACK_RESPONSE],
+            },
+        )
+
+        with SpotifyClient(access_token="test-token") as client:
+            page = client.tracks.get_saved(
+                limit=10,
+                offset=5,
+                market="US",
+            )
+
+        assert page.limit == 10
+        assert page.offset == 5
+        assert page.items[0].track.id == "789"

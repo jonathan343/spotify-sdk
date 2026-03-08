@@ -51,7 +51,7 @@ from .show import (
     SimplifiedEpisode,
     SimplifiedShow,
 )
-from .track import SimplifiedTrack, Track
+from .track import SavedTrack, SimplifiedTrack, Track
 from .user import CurrentUser, ExplicitContent
 
 # Rebuild models that use forward references
@@ -85,6 +85,7 @@ __all__ = [
     "Artist",
     "SimplifiedArtist",
     # Track
+    "SavedTrack",
     "SimplifiedTrack",
     "Track",
     # User
