@@ -1,0 +1,5 @@
+{
+  "type": "feature",
+  "category": "player",
+  "description": "Add player service support for playback state, device control, queue management, and recently played endpoints in both async and sync clients, with typed playback models and reference docs. ([#69](https://github.com/jonathan343/spotify-sdk/pull/69))"
+}
