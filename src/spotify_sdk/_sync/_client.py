@@ -12,6 +12,7 @@ from .services.audiobooks import AudiobookService
 from .services.chapters import ChapterService
 from .services.episodes import EpisodeService
 from .services.library import LibraryService
+from .services.player import PlayerService
 from .services.playlists import PlaylistService
 from .services.search import SearchService
 from .services.shows import ShowService
@@ -76,6 +77,7 @@ class SpotifyClient:
         self.chapters = ChapterService(self._base_client)
         self.episodes = EpisodeService(self._base_client)
         self.library = LibraryService(self._base_client)
+        self.player = PlayerService(self._base_client)
         self.search = SearchService(self._base_client)
         self.shows = ShowService(self._base_client)
         self.tracks = TrackService(self._base_client)

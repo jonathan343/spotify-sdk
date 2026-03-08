@@ -151,6 +151,7 @@ The main client exposes service objects as attributes:
 | `client.chapters` | Chapter operations |
 | `client.episodes` | Episode operations |
 | `client.library` | Save, remove, and check library items |
+| `client.player` | Playback state and player control operations |
 | `client.playlists` | Playlist operations |
 | `client.search` | Catalog search operations |
 | `client.shows` | Show operations |

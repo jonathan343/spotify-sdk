@@ -23,6 +23,17 @@ from .common import (
     Page,
     Restriction,
 )
+from .player import (
+    CurrentlyPlaying,
+    PlaybackActions,
+    PlaybackContext,
+    PlaybackItem,
+    PlaybackQueue,
+    PlaybackState,
+    PlayerDevice,
+    RecentlyPlayedItem,
+    RecentlyPlayedPage,
+)
 from .playlist import (
     Playlist,
     PlaylistTrack,
@@ -59,6 +70,16 @@ __all__ = [
     "LinkedFrom",
     "Page",
     "Restriction",
+    # Player
+    "CurrentlyPlaying",
+    "PlaybackActions",
+    "PlaybackContext",
+    "PlaybackItem",
+    "PlaybackQueue",
+    "PlaybackState",
+    "PlayerDevice",
+    "RecentlyPlayedItem",
+    "RecentlyPlayedPage",
     # Artist
     "Artist",
     "SimplifiedArtist",
