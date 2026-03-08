@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Literal
 
 from pydantic import Field
@@ -82,6 +83,13 @@ class Audiobook(SimplifiedAudiobook):
     """Complete audiobook with chapter list."""
 
     chapters: Page[SimplifiedChapter]
+
+
+class SavedAudiobook(SpotifyModel):
+    """Audiobook saved in a user's library with timestamp metadata."""
+
+    added_at: datetime
+    audiobook: SimplifiedAudiobook
 
 
 class Chapter(SimplifiedChapter):

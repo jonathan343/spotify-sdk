@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ...models import Audiobook, Page, SimplifiedChapter
+from ...models import Audiobook, Page, SavedAudiobook, SimplifiedChapter
 from .._base_service import BaseService
 
 
@@ -27,32 +27,6 @@ class AudiobookService(BaseService):
         params = {"market": market} if market else None
         data = self._get(f"/audiobooks/{id}", params=params)
         return Audiobook.model_validate(data)
-
-    def get_several(
-        self,
-        ids: list[str],
-        market: str | None = None,
-    ) -> list[Audiobook]:
-        """Get multiple audiobooks by IDs.
-
-        Args:
-            ids: List of Spotify audiobook IDs. The Spotify API enforces a
-                maximum of 50 IDs per request.
-            market: An ISO 3166-1 alpha-2 country code for availability.
-
-        Returns:
-            List of audiobooks.
-
-        Raises:
-            ValueError: If ids is empty.
-        """
-        if not ids:
-            raise ValueError("ids cannot be empty")
-        params: dict[str, str] = {"ids": ",".join(ids)}
-        if market:
-            params["market"] = market
-        data = self._get("/audiobooks", params=params)
-        return [Audiobook.model_validate(a) for a in data["audiobooks"]]
 
     def get_chapters(
         self,
@@ -80,3 +54,22 @@ class AudiobookService(BaseService):
         params = {"market": market, "limit": limit, "offset": offset}
         data = self._get(f"/audiobooks/{id}/chapters", params=params)
         return Page[SimplifiedChapter].model_validate(data)
+
+    def get_saved(
+        self,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> Page[SavedAudiobook]:
+        """Get audiobooks saved in the current user's library.
+
+        Args:
+            limit: Maximum number of audiobooks to return (1-50, default 20).
+            offset: Index of the first audiobook to return.
+
+        Returns:
+            Paginated list of saved audiobooks.
+        """
+        data = self._get(
+            "/me/audiobooks", params={"limit": limit, "offset": offset}
+        )
+        return Page[SavedAudiobook].model_validate(data)

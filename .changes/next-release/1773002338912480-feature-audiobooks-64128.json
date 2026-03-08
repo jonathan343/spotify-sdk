@@ -1,0 +1,5 @@
+{
+  "type": "feature",
+  "category": "audiobooks",
+  "description": "Added `audiobooks.get_saved()` for Spotify's saved audiobooks endpoint (`GET /me/audiobooks`), with typed saved-audiobook models in both async and sync clients. ([#71](https://github.com/jonathan343/spotify-sdk/pull/71))"
+}

@@ -8,6 +8,7 @@ from .audiobook import (
     AudiobookNarrator,
     Chapter,
     ResumePoint,
+    SavedAudiobook,
     SimplifiedAudiobook,
     SimplifiedChapter,
 )
@@ -99,6 +100,7 @@ __all__ = [
     "AudiobookNarrator",
     "Chapter",
     "ResumePoint",
+    "SavedAudiobook",
     "SimplifiedAudiobook",
     "SimplifiedChapter",
     # Playlist

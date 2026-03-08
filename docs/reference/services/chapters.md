@@ -11,7 +11,6 @@ Chapter operations live under `client.chapters`.
 | Method | Returns | Description |
 | --- | --- | --- |
 | `get(id, market=None)` | `Chapter` | Fetch a chapter by Spotify ID |
-| `get_several(ids, market=None)` | `list[Chapter]` | Fetch multiple chapters (max 50 IDs) |
 
 ## Examples
 
@@ -22,9 +21,6 @@ Chapter operations live under `client.chapters`.
 
     with SpotifyClient(access_token="your-access-token") as client:
         chapter = client.chapters.get("example_chapter_id")
-        chapters = client.chapters.get_several(
-            ["example_chapter_id", "another_chapter_id"],
-        )
     ```
 
 === "Async"
@@ -36,9 +32,6 @@ Chapter operations live under `client.chapters`.
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             chapter = await client.chapters.get("example_chapter_id")
-            chapters = await client.chapters.get_several(
-                ["example_chapter_id", "another_chapter_id"],
-            )
 
     asyncio.run(main())
     ```
