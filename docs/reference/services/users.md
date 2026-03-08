@@ -14,18 +14,13 @@ User operations live under `client.users`.
 | `get_top_artists(time_range=None, limit=None, offset=None)` | `Page[Artist]` | Fetch the current user's top artists |
 | `get_top_tracks(time_range=None, limit=None, offset=None)` | `Page[Track]` | Fetch the current user's top tracks |
 | `get_followed_artists(after=None, limit=None)` | `CursorPage[Artist]` | Fetch artists followed by the current user |
-| `follow_playlist(id, public=None)` | `None` | Follow a playlist as the current user |
-| `unfollow_playlist(id)` | `None` | Unfollow a playlist as the current user |
-| `follow_artists_or_users(type_, ids)` | `None` | Follow artists or users |
-| `unfollow_artists_or_users(type_, ids)` | `None` | Unfollow artists or users |
-| `check_follows_artists_or_users(type_, ids)` | `list[bool]` | Check if current user follows artists or users |
-| `check_if_follows_playlist(id, user_ids)` | `list[bool]` | Check if users follow a playlist |
 
 !!! tip "Required scopes"
-    Spotify requires user-scoped access tokens for these endpoints. Ensure your
-    auth flow requests scopes such as `user-read-private` and
-    `user-top-read`, `user-follow-read`, and `user-follow-modify`, plus
-    playlist scopes when following/checking playlists.
+    Spotify requires user-scoped access tokens for these endpoints. Request the
+    scopes that match the methods you call: `user-read-private` for
+    `get_current_profile()`, `user-top-read` for top artists and tracks, and
+    `user-follow-read` for `get_followed_artists()`. For follow management and
+    saved-item checks, use `client.library` instead.
 
 ## Examples
 
@@ -41,11 +36,6 @@ User operations live under `client.users`.
             limit=5,
         )
         followed = client.users.get_followed_artists(limit=5)
-        artist_follow_flags = client.users.check_follows_artists_or_users(
-            "artist",
-            ["example_artist_id"],
-        )
-        client.users.follow_playlist("example_playlist_id", public=False)
     ```
 
 === "Async"
@@ -62,14 +52,6 @@ User operations live under `client.users`.
                 limit=5,
             )
             followed = await client.users.get_followed_artists(limit=5)
-            artist_follow_flags = await client.users.check_follows_artists_or_users(
-                "artist",
-                ["example_artist_id"],
-            )
-            await client.users.follow_playlist(
-                "example_playlist_id",
-                public=False,
-            )
 
     asyncio.run(main())
     ```
