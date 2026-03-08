@@ -13,13 +13,15 @@ from .._async.auth import (
 from .._async.auth import (
     AsyncAuthProvider,
     AsyncClientCredentials,
+)
+from .._async.auth import (
+    authorize_local as _authorize_local_async_impl,
+)
+from .._auth_shared import (
     FileTokenCache,
     InMemoryTokenCache,
     TokenCache,
     TokenInfo,
-)
-from .._async.auth import (
-    authorize_local as _authorize_local_async_impl,
 )
 from .._sync.auth import (
     AuthorizationCode as _AuthorizationCode,
