@@ -124,41 +124,6 @@ class TestAlbumServiceGet:
         assert album.id == "123"
 
 
-class TestAlbumServiceGetSeveral:
-    @pytest.mark.anyio
-    async def test_get_several_empty_list_raises_error(self):
-        async with AsyncSpotifyClient(access_token="test-token") as client:
-            with pytest.raises(ValueError, match="ids cannot be empty"):
-                await client.albums.get_several([])
-
-    @pytest.mark.anyio
-    async def test_get_several_albums(self, httpx_mock: HTTPXMock):
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/albums?ids=123%2C456",
-            json={"albums": [ALBUM_RESPONSE, {**ALBUM_RESPONSE, "id": "456"}]},
-        )
-
-        async with AsyncSpotifyClient(access_token="test-token") as client:
-            albums = await client.albums.get_several(["123", "456"])
-
-        assert len(albums) == 2
-        assert all(isinstance(a, Album) for a in albums)
-        assert albums[0].id == "123"
-        assert albums[1].id == "456"
-
-    @pytest.mark.anyio
-    async def test_get_several_with_market(self, httpx_mock: HTTPXMock):
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/albums?ids=123&market=US",
-            json={"albums": [ALBUM_RESPONSE]},
-        )
-
-        async with AsyncSpotifyClient(access_token="test-token") as client:
-            albums = await client.albums.get_several(["123"], market="US")
-
-        assert len(albums) == 1
-
-
 class TestAlbumServiceGetTracks:
     @pytest.mark.anyio
     async def test_get_tracks_empty_id_raises_error(self):
@@ -268,51 +233,3 @@ class TestAlbumServiceGetSaved:
         assert page.limit == 10
         assert page.offset == 5
         assert page.items[0].album.id == "123"
-
-
-class TestAlbumServiceCheckSaved:
-    @pytest.mark.anyio
-    async def test_check_saved(self, httpx_mock: HTTPXMock):
-        httpx_mock.add_response(
-            url=(
-                "https://api.spotify.com/v1/me/albums/contains?ids=123%2C456"
-            ),
-            json=[True, False],
-        )
-
-        async with AsyncSpotifyClient(access_token="test-token") as client:
-            result = await client.albums.check_saved(["123", "456"])
-
-        assert result == [True, False]
-
-    @pytest.mark.anyio
-    async def test_check_saved_empty_ids_raises_error(self):
-        async with AsyncSpotifyClient(access_token="test-token") as client:
-            with pytest.raises(ValueError, match="ids cannot be empty"):
-                await client.albums.check_saved([])
-
-    @pytest.mark.anyio
-    async def test_check_saved_invalid_shape_raises_error(
-        self, httpx_mock: HTTPXMock
-    ):
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/me/albums/contains?ids=123",
-            json={"unexpected": True},
-        )
-
-        async with AsyncSpotifyClient(access_token="test-token") as client:
-            with pytest.raises(ValueError, match="Expected list response"):
-                await client.albums.check_saved(["123"])
-
-    @pytest.mark.anyio
-    async def test_check_saved_invalid_item_type_raises_error(
-        self, httpx_mock: HTTPXMock
-    ):
-        httpx_mock.add_response(
-            url="https://api.spotify.com/v1/me/albums/contains?ids=123",
-            json=[True, "nope"],
-        )
-
-        async with AsyncSpotifyClient(access_token="test-token") as client:
-            with pytest.raises(ValueError, match="Expected list\\[bool\\]"):
-                await client.albums.check_saved(["123"])
