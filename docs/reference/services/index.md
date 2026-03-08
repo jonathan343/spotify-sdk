@@ -43,6 +43,7 @@ attributes on the client instance.
 | [Episodes](episodes.md) | Episode details and saved-episode lookups |
 | [Artists](artists.md) | Artist profiles, albums, and top tracks |
 | [Library](library.md) | Save, remove, and check items in the user's library |
+| [Player](player.md) | Playback state, queue, devices, and playback controls |
 | [Playlists](playlists.md) | Playlist details, items, and images |
 | [Search](search.md) | Catalog search across supported Spotify resource types |
 | [Shows](shows.md) | Show details, episode lists, and saved shows |
