@@ -83,37 +83,6 @@ class AsyncUserService(AsyncBaseService):
         data = await self._get("/me/top/tracks", params=params)
         return Page[Track].model_validate(data)
 
-    async def follow_playlist(
-        self, id: str, public: bool | None = None
-    ) -> None:
-        """Add the current user as a follower of a playlist.
-
-        Args:
-            id: The Spotify ID of the playlist to follow.
-            public: If `True`, the playlist is included in the current user's
-                public playlists. If `False`, it remains private.
-
-        Raises:
-            ValueError: If id is empty.
-        """
-        if not id:
-            raise ValueError("id cannot be empty")
-        payload = {"public": public} if public is not None else None
-        await self._put(f"/playlists/{id}/followers", json=payload)
-
-    async def unfollow_playlist(self, id: str) -> None:
-        """Remove the current user as a follower of a playlist.
-
-        Args:
-            id: The Spotify ID of the playlist to unfollow.
-
-        Raises:
-            ValueError: If id is empty.
-        """
-        if not id:
-            raise ValueError("id cannot be empty")
-        await self._delete(f"/playlists/{id}/followers")
-
     async def get_followed_artists(
         self, after: str | None = None, limit: int | None = None
     ) -> CursorPage[Artist]:
@@ -136,89 +105,6 @@ class AsyncUserService(AsyncBaseService):
         data = await self._get("/me/following", params=params)
         return CursorPage[Artist].model_validate(data["artists"])
 
-    async def follow_artists_or_users(
-        self, type_: FollowType, ids: list[str]
-    ) -> None:
-        """Add the current user as follower of one or more artists/users.
-
-        Args:
-            type_: Resource type to follow (`artist` or `user`).
-            ids: Spotify IDs to follow.
-
-        Raises:
-            ValueError: If ids is empty or type_ is invalid.
-        """
-        params = self._build_follow_params(type_=type_, ids=ids)
-        await self._put("/me/following", params=params)
-
-    async def unfollow_artists_or_users(
-        self, type_: FollowType, ids: list[str]
-    ) -> None:
-        """Remove artists/users from the current user's follows.
-
-        Args:
-            type_: Resource type to unfollow (`artist` or `user`).
-            ids: Spotify IDs to unfollow.
-
-        Raises:
-            ValueError: If ids is empty or type_ is invalid.
-        """
-        params = self._build_follow_params(type_=type_, ids=ids)
-        await self._delete("/me/following", params=params)
-
-    async def check_follows_artists_or_users(
-        self, type_: FollowType, ids: list[str]
-    ) -> list[bool]:
-        """Check if the current user follows artists/users.
-
-        Args:
-            type_: Resource type to check (`artist` or `user`).
-            ids: Spotify IDs to check.
-
-        Returns:
-            A list of booleans aligned to input ids.
-
-        Raises:
-            ValueError: If ids is empty, type_ is invalid, or the response
-                shape is not `list[bool]`.
-        """
-        params = self._build_follow_params(type_=type_, ids=ids)
-        data = await self._get("/me/following/contains", params=params)
-        return self._validate_bool_list_response(
-            data,
-            endpoint="/me/following/contains",
-        )
-
-    async def check_if_follows_playlist(
-        self, id: str, user_ids: list[str]
-    ) -> list[bool]:
-        """Check if users follow a playlist.
-
-        Args:
-            id: The Spotify ID of the playlist.
-            user_ids: Spotify user IDs to check.
-
-        Returns:
-            A list of booleans aligned to input user_ids.
-
-        Raises:
-            ValueError: If id is empty, user_ids is empty, or the response
-                shape is not `list[bool]`.
-        """
-        if not id:
-            raise ValueError("id cannot be empty")
-        if not user_ids:
-            raise ValueError("user_ids cannot be empty")
-
-        data = await self._get(
-            f"/playlists/{id}/followers/contains",
-            params={"ids": ",".join(user_ids)},
-        )
-        return self._validate_bool_list_response(
-            data,
-            endpoint=f"/playlists/{id}/followers/contains",
-        )
-
     def _build_top_items_params(
         self,
         time_range: TimeRange | None,
@@ -237,14 +123,3 @@ class AsyncUserService(AsyncBaseService):
         if offset is not None:
             params["offset"] = offset
         return params
-
-    def _build_follow_params(
-        self, type_: FollowType, ids: list[str]
-    ) -> dict[str, str]:
-        if type_ not in VALID_FOLLOW_TYPES:
-            raise ValueError(
-                f"Invalid type_. Valid values: {VALID_FOLLOW_TYPES}"
-            )
-        if not ids:
-            raise ValueError("ids cannot be empty")
-        return {"type": type_, "ids": ",".join(ids)}
