@@ -11,14 +11,13 @@ Playlist operations live under `client.playlists`.
 | Method | Returns | Description |
 | --- | --- | --- |
 | `get(id, market=None, fields=None)` | `Playlist` | Fetch a playlist by ID |
-| `get_items(id, market=None, fields=None, limit=None, offset=None)` | `Page[PlaylistTrack]` | Fetch playlist items |
+| `get_items(id, market=None, fields=None, limit=None, offset=None)` | `Page[PlaylistItem]` | Fetch playlist items |
 | `get_for_current_user(limit=None, offset=None)` | `Page[SimplifiedPlaylist]` | Fetch playlists for the current user |
-| `get_for_user(id, limit=None, offset=None)` | `Page[SimplifiedPlaylist]` | Fetch playlists for a specific user |
-| `create(user_id, name, public=None, collaborative=None, description=None)` | `SimplifiedPlaylist` | Create a playlist for a user |
+| `create(name, public=None, collaborative=None, description=None)` | `SimplifiedPlaylist` | Create a playlist for the current user |
 | `change_details(id, name=None, public=None, collaborative=None, description=None)` | `None` | Update playlist metadata |
 | `reorder_or_replace_items(id, uris=None, range_start=None, insert_before=None, range_length=None, snapshot_id=None)` | `str` | Reorder existing items or replace all items |
 | `add_items(id, uris, position=None)` | `str` | Add items to a playlist |
-| `remove_items(id, *, uris=None, tracks=None, snapshot_id=None)` | `str` | Remove items from a playlist |
+| `remove_items(id, *, uris=None, items=None, snapshot_id=None)` | `str` | Remove items from a playlist |
 | `get_cover_image(id)` | `list[Image]` | Fetch playlist cover images |
 | `upload_cover_image(id, image_base64_jpeg)` | `None` | Upload a custom playlist cover image |
 
@@ -35,7 +34,6 @@ Playlist operations live under `client.playlists`.
 
     with SpotifyClient(access_token="your-access-token") as client:
         playlist = client.playlists.create(
-            user_id="spotify_user_123",
             name="Road Trip Mix",
             public=False,
             description="Songs for a long drive",
@@ -59,7 +57,6 @@ Playlist operations live under `client.playlists`.
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             playlist = await client.playlists.create(
-                user_id="spotify_user_123",
                 name="Road Trip Mix",
                 public=False,
             )

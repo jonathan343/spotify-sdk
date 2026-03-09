@@ -6,7 +6,14 @@ import pytest
 from pytest_httpx import HTTPXMock
 
 from spotify_sdk import AsyncSpotifyClient
-from spotify_sdk.models import Image, SimplifiedPlaylist
+from spotify_sdk.models import (
+    Image,
+    Page,
+    Playlist,
+    PlaylistEpisode,
+    PlaylistItem,
+    SimplifiedPlaylist,
+)
 
 SIMPLIFIED_PLAYLIST_RESPONSE = {
     "collaborative": False,
@@ -36,12 +43,96 @@ SIMPLIFIED_PLAYLIST_RESPONSE = {
     },
     "public": False,
     "snapshot_id": "snapshot-123",
-    "tracks": {
-        "href": "https://api.spotify.com/v1/playlists/playlist123/tracks",
+    "items": {
+        "href": "https://api.spotify.com/v1/playlists/playlist123/items",
         "total": 0,
     },
     "type": "playlist",
     "uri": "spotify:playlist:playlist123",
+}
+
+PLAYLIST_ITEM_PAGE_RESPONSE = {
+    "href": "https://api.spotify.com/v1/playlists/playlist123/items",
+    "items": [
+        {
+            "added_at": "2024-01-01T00:00:00Z",
+            "added_by": SIMPLIFIED_PLAYLIST_RESPONSE["owner"],
+            "is_local": False,
+            "item": {
+                "preview_url": "https://p.scdn.co/mp3-preview/example",
+                "available_markets": ["US"],
+                "duration_ms": 123000,
+                "explicit": False,
+                "type": "episode",
+                "episode": False,
+                "track": True,
+                "album": {
+                    "type": "show",
+                    "album_type": "compilation",
+                    "href": "https://api.spotify.com/v1/shows/show123",
+                    "id": "show123",
+                    "images": [
+                        {
+                            "url": "https://i.scdn.co/image/show123",
+                            "height": 640,
+                            "width": 640,
+                        }
+                    ],
+                    "name": "Test Show",
+                    "release_date": None,
+                    "release_date_precision": None,
+                    "uri": "spotify:show:show123",
+                    "artists": [
+                        {
+                            "external_urls": {
+                                "spotify": "https://open.spotify.com/show/show123"
+                            },
+                            "href": "https://api.spotify.com/v1/shows/show123",
+                            "id": "show123",
+                            "name": None,
+                            "type": "Test Show",
+                            "uri": "spotify:show:show123",
+                        }
+                    ],
+                    "external_urls": {
+                        "spotify": "https://open.spotify.com/show/show123"
+                    },
+                    "total_tracks": 1,
+                },
+                "artists": [
+                    {
+                        "external_urls": {
+                            "spotify": "https://open.spotify.com/show/show123"
+                        },
+                        "href": "https://api.spotify.com/v1/shows/show123",
+                        "id": "show123",
+                        "name": None,
+                        "type": "Test Show",
+                        "uri": "spotify:show:show123",
+                    }
+                ],
+                "disc_number": 0,
+                "track_number": 0,
+                "external_ids": {
+                    "spotify": "https://open.spotify.com/episode/episode123"
+                },
+                "external_urls": {
+                    "spotify": "https://open.spotify.com/episode/episode123"
+                },
+                "href": "https://api.spotify.com/v1/episodes/episode123",
+                "id": "episode123",
+                "name": "Test Episode",
+                "popularity": 0,
+                "uri": "spotify:episode:episode123",
+                "is_local": False,
+            },
+        }
+    ],
+    "limit": 20,
+    "next": None,
+    "offset": 0,
+    "previous": None,
+    "total": 1,
 }
 
 SNAPSHOT_RESPONSE = {"snapshot_id": "snapshot-456"}
@@ -54,18 +145,57 @@ IMAGE_RESPONSE = [
 ]
 
 
+class TestPlaylistServiceGet:
+    @pytest.mark.anyio
+    async def test_get(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(
+            method="GET",
+            url="https://api.spotify.com/v1/playlists/playlist123",
+            json={
+                **SIMPLIFIED_PLAYLIST_RESPONSE,
+                "items": PLAYLIST_ITEM_PAGE_RESPONSE,
+            },
+        )
+
+        async with AsyncSpotifyClient(access_token="test-token") as client:
+            playlist = await client.playlists.get("playlist123")
+
+        assert isinstance(playlist, Playlist)
+        assert isinstance(playlist.items, Page)
+        assert isinstance(playlist.items.items[0], PlaylistItem)
+        assert isinstance(playlist.items.items[0].item, PlaylistEpisode)
+        assert playlist.items.items[0].item.id == "episode123"
+
+
+class TestPlaylistServiceGetItems:
+    @pytest.mark.anyio
+    async def test_get_items(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(
+            method="GET",
+            url="https://api.spotify.com/v1/playlists/playlist123/items",
+            json=PLAYLIST_ITEM_PAGE_RESPONSE,
+        )
+
+        async with AsyncSpotifyClient(access_token="test-token") as client:
+            page = await client.playlists.get_items("playlist123")
+
+        assert isinstance(page, Page)
+        assert isinstance(page.items[0], PlaylistItem)
+        assert isinstance(page.items[0].item, PlaylistEpisode)
+        assert page.items[0].item.id == "episode123"
+
+
 class TestPlaylistServiceCreate:
     @pytest.mark.anyio
     async def test_create_playlist(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             method="POST",
-            url="https://api.spotify.com/v1/users/test_user/playlists",
+            url="https://api.spotify.com/v1/me/playlists",
             json=SIMPLIFIED_PLAYLIST_RESPONSE,
         )
 
         async with AsyncSpotifyClient(access_token="test-token") as client:
             playlist = await client.playlists.create(
-                "test_user",
                 "Test Playlist",
                 public=False,
                 collaborative=True,
@@ -87,16 +217,10 @@ class TestPlaylistServiceCreate:
         }
 
     @pytest.mark.anyio
-    async def test_create_playlist_empty_user_id_raises_error(self):
-        async with AsyncSpotifyClient(access_token="test-token") as client:
-            with pytest.raises(ValueError, match="user_id cannot be empty"):
-                await client.playlists.create("", "Test Playlist")
-
-    @pytest.mark.anyio
     async def test_create_playlist_empty_name_raises_error(self):
         async with AsyncSpotifyClient(access_token="test-token") as client:
             with pytest.raises(ValueError, match="name cannot be empty"):
-                await client.playlists.create("test_user", "")
+                await client.playlists.create("")
 
     @pytest.mark.anyio
     async def test_create_playlist_collaborative_requires_private(self):
@@ -106,7 +230,6 @@ class TestPlaylistServiceCreate:
                 match="public must be False when collaborative is True",
             ):
                 await client.playlists.create(
-                    "test_user",
                     "Test Playlist",
                     collaborative=True,
                 )
@@ -172,7 +295,7 @@ class TestPlaylistServiceReorderOrReplaceItems:
     async def test_replace_items(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             method="PUT",
-            url="https://api.spotify.com/v1/playlists/playlist123/tracks",
+            url="https://api.spotify.com/v1/playlists/playlist123/items",
             json=SNAPSHOT_RESPONSE,
         )
 
@@ -198,7 +321,7 @@ class TestPlaylistServiceReorderOrReplaceItems:
     async def test_reorder_items(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             method="PUT",
-            url="https://api.spotify.com/v1/playlists/playlist123/tracks",
+            url="https://api.spotify.com/v1/playlists/playlist123/items",
             json=SNAPSHOT_RESPONSE,
         )
 
@@ -260,7 +383,7 @@ class TestPlaylistServiceAddItems:
     async def test_add_items(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             method="POST",
-            url="https://api.spotify.com/v1/playlists/playlist123/tracks",
+            url="https://api.spotify.com/v1/playlists/playlist123/items",
             json=SNAPSHOT_RESPONSE,
         )
 
@@ -302,7 +425,7 @@ class TestPlaylistServiceRemoveItems:
     async def test_remove_items_by_uris(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             method="DELETE",
-            url="https://api.spotify.com/v1/playlists/playlist123/tracks",
+            url="https://api.spotify.com/v1/playlists/playlist123/items",
             json=SNAPSHOT_RESPONSE,
         )
 
@@ -316,7 +439,7 @@ class TestPlaylistServiceRemoveItems:
         assert snapshot_id == "snapshot-456"
         requests = httpx_mock.get_requests()
         assert json.loads(requests[0].content.decode()) == {
-            "tracks": [
+            "items": [
                 {"uri": "spotify:track:track123"},
                 {"uri": "spotify:episode:episode456"},
             ],
@@ -324,23 +447,23 @@ class TestPlaylistServiceRemoveItems:
         }
 
     @pytest.mark.anyio
-    async def test_remove_items_by_tracks(self, httpx_mock: HTTPXMock):
+    async def test_remove_items_by_items(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             method="DELETE",
-            url="https://api.spotify.com/v1/playlists/playlist123/tracks",
+            url="https://api.spotify.com/v1/playlists/playlist123/items",
             json=SNAPSHOT_RESPONSE,
         )
 
         async with AsyncSpotifyClient(access_token="test-token") as client:
             snapshot_id = await client.playlists.remove_items(
                 "playlist123",
-                tracks=[{"uri": "spotify:track:track123", "positions": [2]}],
+                items=[{"uri": "spotify:track:track123", "positions": [2]}],
             )
 
         assert snapshot_id == "snapshot-456"
         requests = httpx_mock.get_requests()
         assert json.loads(requests[0].content.decode()) == {
-            "tracks": [
+            "items": [
                 {"uri": "spotify:track:track123", "positions": [2]},
             ]
         }
@@ -358,33 +481,33 @@ class TestPlaylistServiceRemoveItems:
     async def test_remove_items_requires_exactly_one_payload(self):
         async with AsyncSpotifyClient(access_token="test-token") as client:
             with pytest.raises(
-                ValueError, match="Provide exactly one of uris or tracks"
+                ValueError, match="Provide exactly one of uris or items"
             ):
                 await client.playlists.remove_items("playlist123")
 
             with pytest.raises(
-                ValueError, match="Provide exactly one of uris or tracks"
+                ValueError, match="Provide exactly one of uris or items"
             ):
                 await client.playlists.remove_items(
                     "playlist123",
                     uris=["spotify:track:track123"],
-                    tracks=[{"uri": "spotify:track:track456"}],
+                    items=[{"uri": "spotify:track:track456"}],
                 )
 
     @pytest.mark.anyio
-    async def test_remove_items_track_missing_uri_raises_error(self):
+    async def test_remove_items_item_missing_uri_raises_error(self):
         async with AsyncSpotifyClient(access_token="test-token") as client:
             with pytest.raises(
                 ValueError,
-                match="Each track must include a non-empty uri",
+                match="Each item must include a non-empty uri",
             ):
                 await client.playlists.remove_items(
                     "playlist123",
-                    tracks=[{"positions": [1]}],  # type: ignore[list-item]
+                    items=[{"positions": [1]}],  # type: ignore[list-item]
                 )
 
     @pytest.mark.anyio
-    async def test_remove_items_track_invalid_positions_raises_error(self):
+    async def test_remove_items_item_invalid_positions_raises_error(self):
         async with AsyncSpotifyClient(access_token="test-token") as client:
             with pytest.raises(
                 ValueError,
@@ -392,7 +515,7 @@ class TestPlaylistServiceRemoveItems:
             ):
                 await client.playlists.remove_items(
                     "playlist123",
-                    tracks=[
+                    items=[
                         {
                             "uri": "spotify:track:track123",
                             "positions": "bad",  # type: ignore[dict-item]

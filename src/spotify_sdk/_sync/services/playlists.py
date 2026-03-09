@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ...models import Image, Page, Playlist, PlaylistTrack, SimplifiedPlaylist
+from ...models import Image, Page, Playlist, PlaylistItem, SimplifiedPlaylist
 from .._base_service import BaseService
 
 
@@ -29,11 +29,11 @@ class PlaylistService(BaseService):
                 A dot separator can be used to specify non-reoccurring fields, while
                 parentheses can be used to specify reoccurring fields within objects.
                 For example, to get just the added date and user ID of the adder
-                `fields=tracks.items(added_at,added_by.id)`. Use multiple parentheses
+                `fields=items(added_at,added_by.id)`. Use multiple parentheses
                 to drill down into nested objects, for example
-                `fields=tracks.items(track(name,href,album(name,href)))`.
+                `fields=items(item(name,href,album(name,href)))`.
                 Fields can be excluded by prefixing them with an exclamation mark,
-                for example: `fields=tracks.items(track(name,href,album(!name,href)))`
+                for example: `fields=items(item(name,href,album(!name,href)))`
 
         Returns:
             The requested playlist.
@@ -60,8 +60,8 @@ class PlaylistService(BaseService):
         fields: str | None = None,
         limit: int | None = None,
         offset: int | None = None,
-    ) -> Page[PlaylistTrack]:
-        """Get full details of the items of a playlist owned by a Spotify user.
+    ) -> Page[PlaylistItem]:
+        """Get full details of the items of a playlist.
 
         Args:
             id: The [Spotify ID](https://developer.spotify.com/documentation/web-api/concepts/spotify-uris-ids)
@@ -77,15 +77,15 @@ class PlaylistService(BaseService):
                 within objects. For example, to get just the added date and
                 user ID of the adder: `fields=items(added_at,added_by.id)`
                 Use multiple parentheses to drill down into nested objects,
-                for example: `fields=items(track(name,href,album(name,href)))`
+                for example: `fields=items(item(name,href,album(name,href)))`
                 Fields can be excluded by prefixing them with an exclamation mark,
-                for example: `fields=items.track.album(!external_urls,images)`
+                for example: `fields=items(item(album(!external_urls,images)))`
             limit: The maximum number of items to return. Default: 20. Minimum: 1. Maximum: 50.
             offset: The index of the first item to return. Default: 0 (the first item).
                 Use with limit to get the next set of items.
 
         Returns:
-            Pages of tracks
+            Paged playlist items.
 
         Raises:
             ValueError: If id is empty.
@@ -103,8 +103,8 @@ class PlaylistService(BaseService):
         if offset is not None:
             params["offset"] = offset
 
-        data = self._get(f"/playlists/{id}/tracks", params=params)
-        return Page[PlaylistTrack].model_validate(data)
+        data = self._get(f"/playlists/{id}/items", params=params)
+        return Page[PlaylistItem].model_validate(data)
 
     def get_for_current_user(
         self, limit: int | None = None, offset: int | None = None
@@ -127,47 +127,16 @@ class PlaylistService(BaseService):
         data = self._get("/me/playlists", params=params)
         return Page[SimplifiedPlaylist].model_validate(data)
 
-    def get_for_user(
-        self, id: str, limit: int | None = None, offset: int | None = None
-    ) -> Page[SimplifiedPlaylist]:
-        """Get a list of the playlists owned or followed by a Spotify user.
-
-        Args:
-            id: The user's [Spotify ID](https://developer.spotify.com/documentation/web-api/concepts/spotify-uris-ids).
-            limit: The maximum number of items to return. Default: 20. Minimum: 1. Maximum: 50.
-            offset: The index of the first playlist to return. Default: 0 (the first object).
-                Maximum offset: 100. Use with limit to get the next set of playlists.
-
-        Returns:
-            A paged set of playlists
-
-        Raises:
-            ValueError: If id is empty.
-        """
-        if not id:
-            raise ValueError("id cannot be empty")
-
-        params: dict[str, int] = {}
-        if limit is not None:
-            params["limit"] = limit
-        if offset is not None:
-            params["offset"] = offset
-
-        data = self._get(f"/users/{id}/playlists", params=params)
-        return Page[SimplifiedPlaylist].model_validate(data)
-
     def create(
         self,
-        user_id: str,
         name: str,
         public: bool | None = None,
         collaborative: bool | None = None,
         description: str | None = None,
     ) -> SimplifiedPlaylist:
-        """Create a playlist for a Spotify user.
+        """Create a playlist for the current Spotify user.
 
         Args:
-            user_id: The Spotify user ID that will own the playlist.
             name: The playlist name.
             public: Whether the playlist is public.
             collaborative: Whether the playlist is collaborative.
@@ -177,11 +146,9 @@ class PlaylistService(BaseService):
             The created playlist.
 
         Raises:
-            ValueError: If user_id/name is empty, or collaborative is True
-                while public is not False.
+            ValueError: If name is empty, or collaborative is True while
+                public is not False.
         """
-        if not user_id:
-            raise ValueError("user_id cannot be empty")
         if not name:
             raise ValueError("name cannot be empty")
         if collaborative is True and public is not False:
@@ -195,7 +162,7 @@ class PlaylistService(BaseService):
         if description is not None:
             payload["description"] = description
 
-        data = self._post(f"/users/{user_id}/playlists", json=payload)
+        data = self._post("/me/playlists", json=payload)
         return SimplifiedPlaylist.model_validate(data)
 
     def change_details(
@@ -272,7 +239,7 @@ class PlaylistService(BaseService):
         if not id:
             raise ValueError("id cannot be empty")
 
-        endpoint = f"/playlists/{id}/tracks"
+        endpoint = f"/playlists/{id}/items"
         if uris is not None:
             if (
                 range_start is not None
@@ -322,7 +289,7 @@ class PlaylistService(BaseService):
             raise ValueError("id cannot be empty")
         self._validate_uris(uris)
 
-        endpoint = f"/playlists/{id}/tracks"
+        endpoint = f"/playlists/{id}/items"
         payload: dict[str, object] = {"uris": uris}
         if position is not None:
             payload["position"] = position
@@ -335,7 +302,7 @@ class PlaylistService(BaseService):
         id: str,
         *,
         uris: list[str] | None = None,
-        tracks: list[dict[str, str | list[int]]] | None = None,
+        items: list[dict[str, str | list[int]]] | None = None,
         snapshot_id: str | None = None,
     ) -> str:
         """Remove one or more items from a playlist.
@@ -343,7 +310,7 @@ class PlaylistService(BaseService):
         Args:
             id: The Spotify playlist ID.
             uris: URIs to remove (removed wherever found).
-            tracks: Explicit track objects containing `uri` and optionally
+            items: Explicit item objects containing `uri` and optionally
                 `positions`.
             snapshot_id: Playlist snapshot ID for optimistic concurrency.
 
@@ -351,26 +318,26 @@ class PlaylistService(BaseService):
             New playlist snapshot ID.
 
         Raises:
-            ValueError: If id is empty, both/neither of uris/tracks are
+            ValueError: If id is empty, both/neither of uris/items are
                 provided, or track payloads are invalid.
         """
         if not id:
             raise ValueError("id cannot be empty")
-        if (uris is None and tracks is None) or (
-            uris is not None and tracks is not None
+        if (uris is None and items is None) or (
+            uris is not None and items is not None
         ):
-            raise ValueError("Provide exactly one of uris or tracks")
+            raise ValueError("Provide exactly one of uris or items")
 
         if uris is not None:
             self._validate_uris(uris)
-            tracks_payload: list[dict[str, str | list[int]]] = [
+            items_payload: list[dict[str, str | list[int]]] = [
                 {"uri": uri} for uri in uris
             ]
         else:
-            tracks_payload = self._validate_tracks(tracks)
+            items_payload = self._validate_items(items)
 
-        endpoint = f"/playlists/{id}/tracks"
-        payload: dict[str, object] = {"tracks": tracks_payload}
+        endpoint = f"/playlists/{id}/items"
+        payload: dict[str, object] = {"items": items_payload}
         if snapshot_id is not None:
             payload["snapshot_id"] = snapshot_id
 
@@ -422,24 +389,24 @@ class PlaylistService(BaseService):
         if any(not uri for uri in uris):
             raise ValueError("uris cannot contain empty values")
 
-    def _validate_tracks(
-        self, tracks: list[dict[str, str | list[int]]] | None
+    def _validate_items(
+        self, items: list[dict[str, str | list[int]]] | None
     ) -> list[dict[str, str | list[int]]]:
-        if not tracks:
-            raise ValueError("tracks cannot be empty")
+        if not items:
+            raise ValueError("items cannot be empty")
 
-        for track in tracks:
-            uri = track.get("uri")
+        for item in items:
+            uri = item.get("uri")
             if not isinstance(uri, str) or not uri:
-                raise ValueError("Each track must include a non-empty uri")
-            positions = track.get("positions")
+                raise ValueError("Each item must include a non-empty uri")
+            positions = item.get("positions")
             if positions is not None and (
                 not isinstance(positions, list)
                 or not all(isinstance(position, int) for position in positions)
             ):
                 raise ValueError("positions must be a list of integers")
 
-        return tracks
+        return items
 
     def _extract_snapshot_id(self, data: object, endpoint: str) -> str:
         if not isinstance(data, dict):
