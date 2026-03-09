@@ -1,5 +1,5 @@
 {
   "type": "breaking",
   "category": "playlists",
-  "description": "Updated the Playlists service to match [Spotify's February 2026 Web API removals](https://developer.spotify.com/documentation/web-api/references/changes/february-2026): removed user-specific playlist creation and listing, switched playlist item operations from `/tracks` to `/items`, and updated playlist item parsing for the new `/items` response shape. ([#65](https://github.com/jonathan343/spotify-sdk/pull/65))"
+  "description": "Updated the Playlists service to match [Spotify's February 2026 Web API removals](https://developer.spotify.com/documentation/web-api/references/changes/february-2026): removed user-specific playlist creation and listing, switched playlist item operations from `/tracks` to `/items`, and updated playlist item parsing for the new `/items` response shape. ([#73](https://github.com/jonathan343/spotify-sdk/pull/73))"
 }
