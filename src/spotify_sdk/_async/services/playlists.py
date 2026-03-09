@@ -29,11 +29,11 @@ class AsyncPlaylistService(AsyncBaseService):
                 A dot separator can be used to specify non-reoccurring fields, while
                 parentheses can be used to specify reoccurring fields within objects.
                 For example, to get just the added date and user ID of the adder
-                `fields=tracks.items(added_at,added_by.id)`. Use multiple parentheses
+                `fields=items(added_at,added_by.id)`. Use multiple parentheses
                 to drill down into nested objects, for example
-                `fields=tracks.items(track(name,href,album(name,href)))`.
+                `fields=items(item(name,href,album(name,href)))`.
                 Fields can be excluded by prefixing them with an exclamation mark,
-                for example: `fields=tracks.items(track(name,href,album(!name,href)))`
+                for example: `fields=items(item(name,href,album(!name,href)))`
 
         Returns:
             The requested playlist.
@@ -61,7 +61,7 @@ class AsyncPlaylistService(AsyncBaseService):
         limit: int | None = None,
         offset: int | None = None,
     ) -> Page[PlaylistItem]:
-        """Get full details of the items of a playlist owned by a Spotify user.
+        """Get full details of the items of a playlist.
 
         Args:
             id: The [Spotify ID](https://developer.spotify.com/documentation/web-api/concepts/spotify-uris-ids)
@@ -77,15 +77,15 @@ class AsyncPlaylistService(AsyncBaseService):
                 within objects. For example, to get just the added date and
                 user ID of the adder: `fields=items(added_at,added_by.id)`
                 Use multiple parentheses to drill down into nested objects,
-                for example: `fields=items(track(name,href,album(name,href)))`
+                for example: `fields=items(item(name,href,album(name,href)))`
                 Fields can be excluded by prefixing them with an exclamation mark,
-                for example: `fields=items.track.album(!external_urls,images)`
+                for example: `fields=items(item(album(!external_urls,images)))`
             limit: The maximum number of items to return. Default: 20. Minimum: 1. Maximum: 50.
             offset: The index of the first item to return. Default: 0 (the first item).
                 Use with limit to get the next set of items.
 
         Returns:
-            Pages of tracks
+            Paged playlist items.
 
         Raises:
             ValueError: If id is empty.
@@ -127,47 +127,16 @@ class AsyncPlaylistService(AsyncBaseService):
         data = await self._get("/me/playlists", params=params)
         return Page[SimplifiedPlaylist].model_validate(data)
 
-    async def get_for_user(
-        self, id: str, limit: int | None = None, offset: int | None = None
-    ) -> Page[SimplifiedPlaylist]:
-        """Get a list of the playlists owned or followed by a Spotify user.
-
-        Args:
-            id: The user's [Spotify ID](https://developer.spotify.com/documentation/web-api/concepts/spotify-uris-ids).
-            limit: The maximum number of items to return. Default: 20. Minimum: 1. Maximum: 50.
-            offset: The index of the first playlist to return. Default: 0 (the first object).
-                Maximum offset: 100. Use with limit to get the next set of playlists.
-
-        Returns:
-            A paged set of playlists
-
-        Raises:
-            ValueError: If id is empty.
-        """
-        if not id:
-            raise ValueError("id cannot be empty")
-
-        params: dict[str, int] = {}
-        if limit is not None:
-            params["limit"] = limit
-        if offset is not None:
-            params["offset"] = offset
-
-        data = await self._get(f"/users/{id}/playlists", params=params)
-        return Page[SimplifiedPlaylist].model_validate(data)
-
     async def create(
         self,
-        user_id: str,
         name: str,
         public: bool | None = None,
         collaborative: bool | None = None,
         description: str | None = None,
     ) -> SimplifiedPlaylist:
-        """Create a playlist for a Spotify user.
+        """Create a playlist for the current Spotify user.
 
         Args:
-            user_id: The Spotify user ID that will own the playlist.
             name: The playlist name.
             public: Whether the playlist is public.
             collaborative: Whether the playlist is collaborative.
@@ -177,11 +146,9 @@ class AsyncPlaylistService(AsyncBaseService):
             The created playlist.
 
         Raises:
-            ValueError: If user_id/name is empty, or collaborative is True
-                while public is not False.
+            ValueError: If name is empty, or collaborative is True while
+                public is not False.
         """
-        if not user_id:
-            raise ValueError("user_id cannot be empty")
         if not name:
             raise ValueError("name cannot be empty")
         if collaborative is True and public is not False:
@@ -195,7 +162,7 @@ class AsyncPlaylistService(AsyncBaseService):
         if description is not None:
             payload["description"] = description
 
-        data = await self._post(f"/users/{user_id}/playlists", json=payload)
+        data = await self._post("/me/playlists", json=payload)
         return SimplifiedPlaylist.model_validate(data)
 
     async def change_details(
@@ -343,7 +310,8 @@ class AsyncPlaylistService(AsyncBaseService):
         Args:
             id: The Spotify playlist ID.
             uris: URIs to remove (removed wherever found).
-            items: Explicit item objects containing `uri`.
+            items: Explicit item objects containing `uri` and optionally
+                `positions`.
             snapshot_id: Playlist snapshot ID for optimistic concurrency.
 
         Returns:
@@ -351,7 +319,7 @@ class AsyncPlaylistService(AsyncBaseService):
 
         Raises:
             ValueError: If id is empty, both/neither of uris/items are
-                provided, or item payloads are invalid.
+                provided, or track payloads are invalid.
         """
         if not id:
             raise ValueError("id cannot be empty")
@@ -433,6 +401,12 @@ class AsyncPlaylistService(AsyncBaseService):
             uri = item.get("uri")
             if not isinstance(uri, str) or not uri:
                 raise ValueError("Each item must include a non-empty uri")
+            positions = item.get("positions")
+            if positions is not None and (
+                not isinstance(positions, list)
+                or not all(isinstance(position, int) for position in positions)
+            ):
+                raise ValueError("positions must be a list of integers")
 
         return items
 

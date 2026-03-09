@@ -6,7 +6,14 @@ import pytest
 from pytest_httpx import HTTPXMock
 
 from spotify_sdk import SpotifyClient
-from spotify_sdk.models import Image, SimplifiedPlaylist
+from spotify_sdk.models import (
+    Image,
+    Page,
+    Playlist,
+    PlaylistEpisode,
+    PlaylistItem,
+    SimplifiedPlaylist,
+)
 
 SIMPLIFIED_PLAYLIST_RESPONSE = {
     "collaborative": False,
@@ -44,6 +51,90 @@ SIMPLIFIED_PLAYLIST_RESPONSE = {
     "uri": "spotify:playlist:playlist123",
 }
 
+PLAYLIST_ITEM_PAGE_RESPONSE = {
+    "href": "https://api.spotify.com/v1/playlists/playlist123/items",
+    "items": [
+        {
+            "added_at": "2024-01-01T00:00:00Z",
+            "added_by": SIMPLIFIED_PLAYLIST_RESPONSE["owner"],
+            "is_local": False,
+            "item": {
+                "preview_url": "https://p.scdn.co/mp3-preview/example",
+                "available_markets": ["US"],
+                "duration_ms": 123000,
+                "explicit": False,
+                "type": "episode",
+                "episode": False,
+                "track": True,
+                "album": {
+                    "type": "show",
+                    "album_type": "compilation",
+                    "href": "https://api.spotify.com/v1/shows/show123",
+                    "id": "show123",
+                    "images": [
+                        {
+                            "url": "https://i.scdn.co/image/show123",
+                            "height": 640,
+                            "width": 640,
+                        }
+                    ],
+                    "name": "Test Show",
+                    "release_date": None,
+                    "release_date_precision": None,
+                    "uri": "spotify:show:show123",
+                    "artists": [
+                        {
+                            "external_urls": {
+                                "spotify": "https://open.spotify.com/show/show123"
+                            },
+                            "href": "https://api.spotify.com/v1/shows/show123",
+                            "id": "show123",
+                            "name": None,
+                            "type": "Test Show",
+                            "uri": "spotify:show:show123",
+                        }
+                    ],
+                    "external_urls": {
+                        "spotify": "https://open.spotify.com/show/show123"
+                    },
+                    "total_tracks": 1,
+                },
+                "artists": [
+                    {
+                        "external_urls": {
+                            "spotify": "https://open.spotify.com/show/show123"
+                        },
+                        "href": "https://api.spotify.com/v1/shows/show123",
+                        "id": "show123",
+                        "name": None,
+                        "type": "Test Show",
+                        "uri": "spotify:show:show123",
+                    }
+                ],
+                "disc_number": 0,
+                "track_number": 0,
+                "external_ids": {
+                    "spotify": "https://open.spotify.com/episode/episode123"
+                },
+                "external_urls": {
+                    "spotify": "https://open.spotify.com/episode/episode123"
+                },
+                "href": "https://api.spotify.com/v1/episodes/episode123",
+                "id": "episode123",
+                "name": "Test Episode",
+                "popularity": 0,
+                "uri": "spotify:episode:episode123",
+                "is_local": False,
+            },
+        }
+    ],
+    "limit": 20,
+    "next": None,
+    "offset": 0,
+    "previous": None,
+    "total": 1,
+}
+
 SNAPSHOT_RESPONSE = {"snapshot_id": "snapshot-456"}
 IMAGE_RESPONSE = [
     {
@@ -54,17 +145,54 @@ IMAGE_RESPONSE = [
 ]
 
 
+class TestPlaylistServiceGet:
+    def test_get(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(
+            method="GET",
+            url="https://api.spotify.com/v1/playlists/playlist123",
+            json={
+                **SIMPLIFIED_PLAYLIST_RESPONSE,
+                "items": PLAYLIST_ITEM_PAGE_RESPONSE,
+            },
+        )
+
+        with SpotifyClient(access_token="test-token") as client:
+            playlist = client.playlists.get("playlist123")
+
+        assert isinstance(playlist, Playlist)
+        assert isinstance(playlist.items, Page)
+        assert isinstance(playlist.items.items[0], PlaylistItem)
+        assert isinstance(playlist.items.items[0].item, PlaylistEpisode)
+        assert playlist.items.items[0].item.id == "episode123"
+
+
+class TestPlaylistServiceGetItems:
+    def test_get_items(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(
+            method="GET",
+            url="https://api.spotify.com/v1/playlists/playlist123/items",
+            json=PLAYLIST_ITEM_PAGE_RESPONSE,
+        )
+
+        with SpotifyClient(access_token="test-token") as client:
+            page = client.playlists.get_items("playlist123")
+
+        assert isinstance(page, Page)
+        assert isinstance(page.items[0], PlaylistItem)
+        assert isinstance(page.items[0].item, PlaylistEpisode)
+        assert page.items[0].item.id == "episode123"
+
+
 class TestPlaylistServiceCreate:
     def test_create_playlist(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(
             method="POST",
-            url="https://api.spotify.com/v1/users/test_user/playlists",
+            url="https://api.spotify.com/v1/me/playlists",
             json=SIMPLIFIED_PLAYLIST_RESPONSE,
         )
 
         with SpotifyClient(access_token="test-token") as client:
             playlist = client.playlists.create(
-                "test_user",
                 "Test Playlist",
                 public=False,
                 collaborative=True,
@@ -85,15 +213,10 @@ class TestPlaylistServiceCreate:
             "description": "Test playlist description",
         }
 
-    def test_create_playlist_empty_user_id_raises_error(self):
-        with SpotifyClient(access_token="test-token") as client:
-            with pytest.raises(ValueError, match="user_id cannot be empty"):
-                client.playlists.create("", "Test Playlist")
-
     def test_create_playlist_empty_name_raises_error(self):
         with SpotifyClient(access_token="test-token") as client:
             with pytest.raises(ValueError, match="name cannot be empty"):
-                client.playlists.create("test_user", "")
+                client.playlists.create("")
 
     def test_create_playlist_collaborative_requires_private(self):
         with SpotifyClient(access_token="test-token") as client:
@@ -102,7 +225,6 @@ class TestPlaylistServiceCreate:
                 match="public must be False when collaborative is True",
             ):
                 client.playlists.create(
-                    "test_user",
                     "Test Playlist",
                     collaborative=True,
                 )
@@ -316,14 +438,14 @@ class TestPlaylistServiceRemoveItems:
         with SpotifyClient(access_token="test-token") as client:
             snapshot_id = client.playlists.remove_items(
                 "playlist123",
-                items=[{"uri": "spotify:track:track123"}],
+                items=[{"uri": "spotify:track:track123", "positions": [2]}],
             )
 
         assert snapshot_id == "snapshot-456"
         requests = httpx_mock.get_requests()
         assert json.loads(requests[0].content.decode()) == {
             "items": [
-                {"uri": "spotify:track:track123"},
+                {"uri": "spotify:track:track123", "positions": [2]},
             ]
         }
 
@@ -351,7 +473,7 @@ class TestPlaylistServiceRemoveItems:
                     items=[{"uri": "spotify:track:track456"}],
                 )
 
-    def test_remove_items_track_missing_uri_raises_error(self):
+    def test_remove_items_item_missing_uri_raises_error(self):
         with SpotifyClient(access_token="test-token") as client:
             with pytest.raises(
                 ValueError,
@@ -360,6 +482,22 @@ class TestPlaylistServiceRemoveItems:
                 client.playlists.remove_items(
                     "playlist123",
                     items=[{"positions": [1]}],  # type: ignore[list-item]
+                )
+
+    def test_remove_items_item_invalid_positions_raises_error(self):
+        with SpotifyClient(access_token="test-token") as client:
+            with pytest.raises(
+                ValueError,
+                match="positions must be a list of integers",
+            ):
+                client.playlists.remove_items(
+                    "playlist123",
+                    items=[
+                        {
+                            "uri": "spotify:track:track123",
+                            "positions": "bad",  # type: ignore[dict-item]
+                        }
+                    ],
                 )
 
 

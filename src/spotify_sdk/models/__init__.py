@@ -37,7 +37,9 @@ from .player import (
 )
 from .playlist import (
     Playlist,
+    PlaylistEpisode,
     PlaylistItem,
+    PlaylistItemContent,
     PlaylistItemsRef,
     PublicUser,
     SimplifiedPlaylist,
@@ -57,6 +59,7 @@ from .user import CurrentUser, ExplicitContent
 # Rebuild models that use forward references
 Album.model_rebuild()
 Playlist.model_rebuild()
+PlaylistEpisode.model_rebuild()
 PlaylistItem.model_rebuild()
 
 __all__ = [
@@ -106,6 +109,8 @@ __all__ = [
     "SimplifiedChapter",
     # Playlist
     "Playlist",
+    "PlaylistEpisode",
+    "PlaylistItemContent",
     "PlaylistItem",
     "PlaylistItemsRef",
     "PublicUser",
