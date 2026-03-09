@@ -1,5 +1,0 @@
-{
-  "type": "breaking",
-  "category": "audiobooks",
-  "description": "Removed deprecated `audiobooks.get_several()` and `chapters.get_several()` operations to match [Spotify's February 2026 Web API removals](https://developer.spotify.com/documentation/web-api/references/changes/february-2026), which removed `GET /audiobooks` and `GET /chapters`. ([#71](https://github.com/jonathan343/spotify-sdk/pull/71))"
-}
