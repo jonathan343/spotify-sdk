@@ -1,5 +1,0 @@
-{
-  "type": "breaking",
-  "category": "albums",
-  "description": "Removed deprecated `get_several`, `get_new_releases`, and `check_saved` operations from the Albums service to match [Spotify's February 2026 Web API removals](https://developer.spotify.com/documentation/web-api/references/changes/february-2026). Use `GET /me/library/contains` with Spotify URIs instead of album IDs when replacing `check_saved`. ([#71](https://github.com/jonathan343/spotify-sdk/pull/71))"
-}

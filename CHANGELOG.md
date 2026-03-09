@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.10.0
+
+### Breaking Changes
+* Removed deprecated `get_several` and `get_top_tracks` operations from the Artists service to match [Spotify's February 2026 Web API removals](https://developer.spotify.com/documentation/web-api/references/changes/february-2026), which removed `GET /artists` and `GET /artists/{id}/top-tracks`. ([#71](https://github.com/jonathan343/spotify-sdk/pull/71))
+* Removed deprecated `get_several`, `get_new_releases`, and `check_saved` operations from the Albums service to match [Spotify's February 2026 Web API removals](https://developer.spotify.com/documentation/web-api/references/changes/february-2026). Use `GET /me/library/contains` with Spotify URIs instead of album IDs when replacing `check_saved`. ([#71](https://github.com/jonathan343/spotify-sdk/pull/71))
+* Removed deprecated `audiobooks.get_several()` and `chapters.get_several()` operations to match [Spotify's February 2026 Web API removals](https://developer.spotify.com/documentation/web-api/references/changes/february-2026), which removed `GET /audiobooks` and `GET /chapters`. ([#71](https://github.com/jonathan343/spotify-sdk/pull/71))
+* Removed deprecated `get_several` from the Tracks service to match [Spotify's February 2026 Web API removals](https://developer.spotify.com/documentation/web-api/references/changes/february-2026), which removed `GET /tracks`. ([#71](https://github.com/jonathan343/spotify-sdk/pull/71))
+* Updated the Playlists service to match [Spotify's February 2026 Web API removals](https://developer.spotify.com/documentation/web-api/references/changes/february-2026): removed user-specific playlist creation and listing, switched playlist item operations from `/tracks` to `/items`, and updated playlist item parsing for the new `/items` response shape. ([#73](https://github.com/jonathan343/spotify-sdk/pull/73))
+* Removed deprecated follow, unfollow, and follow-status operations from the Users service to match [Spotify's February 2026 Web API removals](https://developer.spotify.com/documentation/web-api/references/changes/february-2026). Migrate to the generic library endpoints (`PUT /me/library`, `DELETE /me/library`, and `GET /me/library/contains`), which use Spotify URIs instead of resource IDs. ([#71](https://github.com/jonathan343/spotify-sdk/pull/71))
+
+### Features
+* Added `audiobooks.get_saved()` for Spotify's saved audiobooks endpoint (`GET /me/audiobooks`), with typed saved-audiobook models in both async and sync clients. ([#71](https://github.com/jonathan343/spotify-sdk/pull/71))
+* Added `tracks.get_saved()` for Spotify's saved tracks endpoint (`GET /me/tracks`), with typed saved-track models in both async and sync clients. ([#71](https://github.com/jonathan343/spotify-sdk/pull/71))
+* Add player service support for playback state, device control, queue management, and recently played endpoints in both async and sync clients, with typed playback models and reference docs. ([#69](https://github.com/jonathan343/spotify-sdk/pull/69))
+
+### Bug fixes
+* Fixed type checking for `FileTokenCache` when used with sync auth providers exported from `spotify_sdk.auth`. ([#70](https://github.com/jonathan343/spotify-sdk/pull/70))
+
 ## v0.9.1
 
 ### Dependencies
