@@ -51,7 +51,7 @@ nav = [
 
 # Copyright
 copyright = """
-Copyright &copy; 2026 Jonathan Gaytan
+Copyright &copy; 2026 <a href="https://jonathangaytan.com" target="_blank">Jonathan Gaytan</a>
 """
 
 
