@@ -40,10 +40,10 @@ Python version support follows the [official Python release cycle](https://devgu
 
 ## Authentication
 
-The SDK supports:
+To use the SDK, you'll need credentials from the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard). The SDK supports:
 
 - [Access token](https://developer.spotify.com/documentation/web-api/concepts/access-token) authentication
-- Client credentials flow
+- Client credentials flow (auto-refreshes tokens)
 - Authorization code flow with refresh tokens
 
 ```python
@@ -85,13 +85,14 @@ client = SpotifyClient(access_token="your-access-token")
 # Get an album
 album = client.albums.get("5K79FLRUCSysQnVESLcTdb")
 print(f"{album.name} by {album.artists[0].name}")
-# Output: "DeBÍ TiRAR MáS FOToS by Bad Bunny"
+# DeBÍ TiRAR MáS FOToS by Bad Bunny
 
 # Get album tracks
 tracks = client.albums.get_tracks(album.id)
 for track in tracks.items:
     print(f"{track.track_number}. {track.name}")
 
+# Close the underlying HTTP connection when done
 client.close()
 ```
 
@@ -115,77 +116,29 @@ async def main():
     async with AsyncSpotifyClient(access_token="your-access-token") as client:
         album = await client.albums.get("4Uv86qWpGTxf7fU7lG5X6F")
         print(f"{album.name} by {album.artists[0].name}")
-        # "The College Dropout by Kanye West"
+        # The College Dropout by Kanye West
 
 asyncio.run(main())
 ```
 
 ## Services
 
-### Albums
+| Service | Access | Key Methods |
+|---------|--------|-------------|
+| **Albums** | `client.albums` | `get`, `get_tracks`, `get_saved` |
+| **Artists** | `client.artists` | `get`, `get_albums` |
+| **Audiobooks** | `client.audiobooks` | `get`, `get_chapters`, `get_saved` |
+| **Chapters** | `client.chapters` | `get` |
+| **Episodes** | `client.episodes` | `get`, `get_saved` |
+| **Library** | `client.library` | `save_items`, `remove_items`, `check_contains` |
+| **Player** | `client.player` | `get_playback_state`, `start_playback`, `pause_playback`, `skip_to_next`, `add_to_queue`, and [more](https://spotify-sdk.dev/) |
+| **Playlists** | `client.playlists` | `get`, `get_items`, `create`, `add_items`, `remove_items`, and [more](https://spotify-sdk.dev/) |
+| **Search** | `client.search` | `search` |
+| **Shows** | `client.shows` | `get`, `get_episodes`, `get_saved` |
+| **Tracks** | `client.tracks` | `get`, `get_saved` |
+| **Users** | `client.users` | `get_current_profile`, `get_top_artists`, `get_top_tracks`, `get_followed_artists` |
 
-```python
-# Get a single album
-album = client.albums.get("<id>")
-album = client.albums.get("<id>", market="US")
-
-# Get multiple albums (up to 20)
-albums = client.albums.get_several(["<id1>", "<id2>"])
-
-# Get album tracks with pagination
-tracks = client.albums.get_tracks("<id>", limit=10, offset=0)
-```
-
-### Audiobooks
-
-```python
-# Get a single audiobook
-audiobook = client.audiobooks.get("<id>")
-audiobook = client.audiobooks.get("<id>", market="US")
-
-# Get multiple audiobooks (up to 50)
-audiobooks = client.audiobooks.get_several(["<id1>", "<id2>"])
-
-# Get audiobook chapters with pagination
-chapters = client.audiobooks.get_chapters("<id>", limit=10, offset=0)
-```
-
-### Shows
-
-```python
-# Get a single show
-show = client.shows.get("show_id_123")
-show = client.shows.get("show_id_123", market="US")
-
-# Get show episodes with pagination
-episodes = client.shows.get_episodes("show_id_123", limit=10, offset=0)
-
-# Get current user's saved shows
-saved_shows = client.shows.get_saved(limit=10, offset=0)
-```
-
-### Episodes
-
-```python
-# Get a single episode
-episode = client.episodes.get("episode_id_123")
-episode = client.episodes.get("episode_id_123", market="US")
-
-# Get current user's saved episodes
-saved_episodes = client.episodes.get_saved(limit=10, offset=0)
-saved_episodes = client.episodes.get_saved(limit=10, offset=0, market="US")
-```
-
-### Search
-
-```python
-results = client.search.search(
-    q="kind of blue",
-    types=["album", "artist"],
-    market="US",
-    limit=10,
-)
-```
+See the [full documentation](https://spotify-sdk.dev/reference/services/) for detailed method signatures and examples.
 
 ## Error Handling
 
