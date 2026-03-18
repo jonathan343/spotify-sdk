@@ -28,6 +28,7 @@ icon: lucide/rocket
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             # Get an album
@@ -38,6 +39,7 @@ icon: lucide/rocket
             tracks = await client.albums.get_tracks(album.id)
             for track in tracks.items:
                 print(f"{track.track_number}. {track.name}")
+
 
     asyncio.run(main())
     ```
@@ -130,8 +132,8 @@ Customize client behavior:
 ```python
 client = SpotifyClient(
     access_token="your-access-token",
-    timeout=30.0,      # Request timeout in seconds (default: 30.0)
-    max_retries=3,     # Maximum retry attempts (default: 3)
+    timeout=30.0,  # Request timeout in seconds (default: 30.0)
+    max_retries=3,  # Maximum retry attempts (default: 3)
 )
 ```
 

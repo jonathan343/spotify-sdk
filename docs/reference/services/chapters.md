@@ -29,9 +29,11 @@ Chapter operations live under `client.chapters`.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             chapter = await client.chapters.get("example_chapter_id")
+
 
     asyncio.run(main())
     ```

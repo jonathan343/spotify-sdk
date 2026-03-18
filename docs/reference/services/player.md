@@ -64,6 +64,7 @@ Player operations live under `client.player`.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             devices = await client.player.get_devices()
@@ -85,6 +86,7 @@ Player operations live under `client.player`.
                 position_ms=30_000,
             )
             queue = await client.player.get_queue()
+
 
     asyncio.run(main())
     ```

@@ -39,6 +39,7 @@ Artist operations live under `client.artists`.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             artist = await client.artists.get("3TVXtAsR1Inumwj472S9r4")
@@ -47,6 +48,7 @@ Artist operations live under `client.artists`.
                 include_groups=["album", "single"],
                 limit=10,
             )
+
 
     asyncio.run(main())
     ```

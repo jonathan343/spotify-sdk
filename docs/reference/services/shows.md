@@ -37,11 +37,13 @@ Show operations live under `client.shows`.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             show = await client.shows.get("show_id_123")
             episodes = await client.shows.get_episodes(show.id, limit=10)
             saved_shows = await client.shows.get_saved(limit=10)
+
 
     asyncio.run(main())
     ```

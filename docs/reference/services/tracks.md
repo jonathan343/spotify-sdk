@@ -35,10 +35,12 @@ Track operations live under `client.tracks`.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             track = await client.tracks.get("3n3Ppam7vgaVa1iaRUc9Lp")
             saved_tracks = await client.tracks.get_saved(limit=10)
+
 
     asyncio.run(main())
     ```

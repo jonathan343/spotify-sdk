@@ -112,11 +112,13 @@ with SpotifyClient(access_token="your-access-token") as client:
 import asyncio
 from spotify_sdk import AsyncSpotifyClient
 
+
 async def main():
     async with AsyncSpotifyClient(access_token="your-access-token") as client:
         album = await client.albums.get("4Uv86qWpGTxf7fU7lG5X6F")
         print(f"{album.name} by {album.artists[0].name}")
         # The College Dropout by Kanye West
+
 
 asyncio.run(main())
 ```
@@ -186,8 +188,8 @@ except ServerError as e:
 ```python
 client = SpotifyClient(
     access_token="your-access-token",
-    timeout=30.0,      # Request timeout in seconds (default: 30.0)
-    max_retries=3,     # Maximum retry attempts (default: 3)
+    timeout=30.0,  # Request timeout in seconds (default: 30.0)
+    max_retries=3,  # Maximum retry attempts (default: 3)
 )
 ```
 
@@ -213,11 +215,11 @@ All API responses are returned as Pydantic models with full type hints:
 album = client.albums.get("<id>")
 
 # Access typed attributes
-print(album.name)           # str
-print(album.release_date)   # str
-print(album.total_tracks)   # int
-print(album.artists)        # list[SimplifiedArtist]
-print(album.images)         # list[Image]
+print(album.name)  # str
+print(album.release_date)  # str
+print(album.total_tracks)  # int
+print(album.artists)  # list[SimplifiedArtist]
+print(album.images)  # list[Image]
 
 # Models support forward compatibility
 # Unknown fields from the API are preserved

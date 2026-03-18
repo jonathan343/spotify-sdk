@@ -54,6 +54,7 @@ Playlist operations live under `client.playlists`.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             playlist = await client.playlists.create(
@@ -78,6 +79,7 @@ Playlist operations live under `client.playlists`.
                 playlist.id,
                 "<base64-jpeg-data>",
             )
+
 
     asyncio.run(main())
     ```

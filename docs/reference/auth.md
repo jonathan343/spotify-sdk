@@ -140,11 +140,9 @@ from spotify_sdk.auth import TokenInfo
 
 
 class TokenCache(Protocol):
-    def get(self) -> TokenInfo | None:
-        ...
+    def get(self) -> TokenInfo | None: ...
 
-    def set(self, token: TokenInfo) -> None:
-        ...
+    def set(self, token: TokenInfo) -> None: ...
 ```
 
 ### Built-in File Cache
@@ -192,12 +190,11 @@ need a `get_access_token()` method and an optional `close()`.
     ```python
     from typing import Protocol
 
-    class AuthProvider(Protocol):
-        def get_access_token(self) -> str:
-            ...
 
-        def close(self) -> None:
-            ...
+    class AuthProvider(Protocol):
+        def get_access_token(self) -> str: ...
+
+        def close(self) -> None: ...
     ```
 
 === "Async"
@@ -205,10 +202,9 @@ need a `get_access_token()` method and an optional `close()`.
     ```python
     from typing import Protocol
 
-    class AsyncAuthProvider(Protocol):
-        async def get_access_token(self) -> str:
-            ...
 
-        async def close(self) -> None:
-            ...
+    class AsyncAuthProvider(Protocol):
+        async def get_access_token(self) -> str: ...
+
+        async def close(self) -> None: ...
     ```
