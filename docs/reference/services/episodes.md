@@ -35,10 +35,12 @@ Episode operations live under `client.episodes`.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             episode = await client.episodes.get("episode_id_123")
             saved_episodes = await client.episodes.get_saved(limit=10)
+
 
     asyncio.run(main())
     ```

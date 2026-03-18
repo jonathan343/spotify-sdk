@@ -26,9 +26,11 @@ attributes on the client instance.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             album = await client.albums.get("7ycBtnsMtyVbbwTfJwRjSP")
+
 
     asyncio.run(main())
     ```

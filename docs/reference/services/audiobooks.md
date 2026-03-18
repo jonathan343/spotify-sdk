@@ -43,11 +43,13 @@ Audiobook operations live under `client.audiobooks`.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             audiobook = await client.audiobooks.get("7iHfbu1YPACw6oZPAFJtqe")
             chapters = await client.audiobooks.get_chapters(audiobook.id, limit=10)
             saved_audiobooks = await client.audiobooks.get_saved(limit=10)
+
 
     asyncio.run(main())
     ```

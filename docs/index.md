@@ -58,11 +58,13 @@ can build apps against Spotify without managing raw HTTP or JSON.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             album = await client.albums.get("<spotify-album-id>")
             print(album.name)
             print(album.artists[0].name)
+
 
     asyncio.run(main())
     ```

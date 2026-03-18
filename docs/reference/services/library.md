@@ -47,6 +47,7 @@ Library operations live under `client.library`.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             uris = [
@@ -58,6 +59,7 @@ Library operations live under `client.library`.
                 uris,
             )
             await client.library.remove_items(uris)
+
 
     asyncio.run(main())
     ```

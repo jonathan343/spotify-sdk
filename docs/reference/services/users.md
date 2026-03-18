@@ -44,6 +44,7 @@ User operations live under `client.users`.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             me = await client.users.get_current_profile()
@@ -52,6 +53,7 @@ User operations live under `client.users`.
                 limit=5,
             )
             followed = await client.users.get_followed_artists(limit=5)
+
 
     asyncio.run(main())
     ```

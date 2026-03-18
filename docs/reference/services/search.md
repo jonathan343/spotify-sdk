@@ -39,6 +39,7 @@ Search operations live under `client.search`.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             result = await client.search.search(
@@ -48,6 +49,7 @@ Search operations live under `client.search`.
                 limit=10,
             )
             artists = result.artists.items if result.artists else []
+
 
     asyncio.run(main())
     ```

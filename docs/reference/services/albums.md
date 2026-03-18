@@ -42,11 +42,13 @@ Album operations live under `client.albums`.
     import asyncio
     from spotify_sdk import AsyncSpotifyClient
 
+
     async def main() -> None:
         async with AsyncSpotifyClient(access_token="your-access-token") as client:
             album = await client.albums.get("7ycBtnsMtyVbbwTfJwRjSP")
             tracks = await client.albums.get_tracks(album.id, limit=10)
             saved_albums = await client.albums.get_saved(limit=10)
+
 
     asyncio.run(main())
     ```
