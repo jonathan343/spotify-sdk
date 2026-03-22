@@ -39,15 +39,15 @@ attributes on the client instance.
 
 | Service | Description |
 | --- | --- |
-| [Albums](albums.md) | Album details, tracks, and new releases |
+| [Albums](albums.md) | Album details, tracks, and saved albums |
 | [Audiobooks](audiobooks.md) | Audiobook details and chapter lookups |
-| [Chapters](chapters.md) | Chapter details and bulk lookups |
+| [Chapters](chapters.md) | Single chapter lookups |
 | [Episodes](episodes.md) | Episode details and saved-episode lookups |
-| [Artists](artists.md) | Artist profiles, albums, and top tracks |
+| [Artists](artists.md) | Artist profiles and album listings |
 | [Library](library.md) | Save, remove, and check items in the user's library |
 | [Player](player.md) | Playback state, queue, devices, and playback controls |
 | [Playlists](playlists.md) | Playlist details, items, and images |
 | [Search](search.md) | Catalog search across supported Spotify resource types |
 | [Shows](shows.md) | Show details, episode lists, and saved shows |
-| [Tracks](tracks.md) | Track details and bulk lookups |
-| [Users](users.md) | Current-user profile, top items, and playlist follows |
+| [Tracks](tracks.md) | Track details and saved-track lookups |
+| [Users](users.md) | Current-user profile, top items, and followed artists |

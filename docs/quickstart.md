@@ -48,17 +48,18 @@ icon: lucide/rocket
 
 | Service | Description |
 |---------|-------------|
-| `client.albums` | Get albums, album tracks, and multiple albums |
-| `client.artists` | Get artists, artist albums, and top tracks |
-| `client.audiobooks` | Get audiobooks, chapters, and multiple audiobooks |
-| `client.chapters` | Get chapters and multiple chapters |
+| `client.albums` | Get albums, album tracks, and saved albums |
+| `client.artists` | Get artists and artist albums |
+| `client.audiobooks` | Get audiobooks, chapters, and saved audiobooks |
+| `client.chapters` | Get individual chapters |
 | `client.episodes` | Get episodes and saved episodes |
 | `client.library` | Save, remove, and check items in a user's library |
+| `client.player` | Inspect playback state and control playback |
 | `client.playlists` | Get playlists, playlist items, and cover images |
 | `client.search` | Search the Spotify catalog for albums, artists, tracks, and more |
 | `client.shows` | Get shows, show episodes, and saved shows |
-| `client.tracks` | Get tracks and multiple tracks |
-| `client.users` | Get current profile, top artists/tracks, and follow playlists |
+| `client.tracks` | Get tracks and saved tracks |
+| `client.users` | Get current profile, top artists/tracks, and followed artists |
 
 [:octicons-arrow-right-24: Full service reference](reference/services/index.md)
 
