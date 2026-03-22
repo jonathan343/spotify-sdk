@@ -4,8 +4,8 @@
 
 The SDK previously combined sync and async support in a single `SpotifyClient`
 class using a dual-method pattern. Every public operation existed twice: a sync
-version (`get`, `get_several`) and an async version (`get_async`,
-`get_several_async`). The same was true at the infrastructure layer —
+version (`get`, `get_tracks`) and an async version (`get_async`,
+`get_tracks_async`). The same was true at the infrastructure layer —
 `BaseClient.request()` and `BaseClient.request_async()` contained identical
 retry logic, differing only in `await` and `anyio.sleep` vs `time.sleep`.
 
@@ -312,8 +312,8 @@ This is a breaking change for async users:
 |--------------------------------------------------|--------------------------------------------------|
 | `from spotify_sdk import SpotifyClient`          | `from spotify_sdk import AsyncSpotifyClient`     |
 | `await client.albums.get_async("123")`           | `await client.albums.get("123")`                 |
-| `await client.albums.get_several_async([...])`   | `await client.albums.get_several([...])`         |
 | `await client.albums.get_tracks_async("123")`    | `await client.albums.get_tracks("123")`          |
+| `await client.search.search_async("radiohead")`  | `await client.search.search("radiohead", ...)`   |
 | `await client.aclose()`                          | `await client.close()`                           |
 
 Sync users are unaffected — their imports and method calls remain the same.
