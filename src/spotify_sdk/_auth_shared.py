@@ -1,13 +1,19 @@
-"""Shared auth cache types used by sync and async auth providers."""
+"""Shared auth types and helpers used by sync and async auth providers."""
 
 from __future__ import annotations
 
+import asyncio
+import inspect
 import json
 import os
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import Awaitable, Protocol, TypeVar, cast
+
+from anyio import from_thread
+
+_T = TypeVar("_T")
 
 
 @dataclass(frozen=True)
@@ -102,3 +108,18 @@ class FileTokenCache:
             os.chmod(self._path, 0o600)
         except OSError:
             pass
+
+
+def resolve_awaitable(value: _T | Awaitable[_T]) -> _T:
+    """Return ``value``, awaiting it first if it is awaitable."""
+    if inspect.isawaitable(value):
+        awaitable = cast(Awaitable[_T], value)
+        try:
+            return from_thread.run(_await_awaitable, awaitable)
+        except RuntimeError:
+            return asyncio.run(_await_awaitable(awaitable))
+    return value
+
+
+async def _await_awaitable(value: Awaitable[_T]) -> _T:
+    return await value
