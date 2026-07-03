@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import asyncio
 import base64
-import inspect
 import os
 import random
 import secrets
@@ -12,12 +10,11 @@ import threading
 import time
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from typing import Any, Awaitable, Callable, Coroutine, Protocol, TypeVar, cast
+from typing import Any, Callable, Protocol, cast
 from urllib.parse import parse_qs, urlencode, urlparse
 
 import httpx
 import sniffio
-from anyio import from_thread
 
 from ..._auth_shared import (
     FileTokenCache as FileTokenCache,
@@ -26,6 +23,7 @@ from ..._auth_shared import (
     InMemoryTokenCache,
     TokenCache,
     TokenInfo,
+    resolve_awaitable,
 )
 from ...exceptions import AuthenticationError, ServerError, SpotifyError
 
@@ -35,7 +33,6 @@ ENV_CLIENT_ID = "SPOTIFY_SDK_CLIENT_ID"
 ENV_CLIENT_SECRET = "SPOTIFY_SDK_CLIENT_SECRET"
 ENV_REDIRECT_URI = "SPOTIFY_SDK_REDIRECT_URI"
 
-_T = TypeVar("_T")
 _SUCCESS_HTML = """\
 <html>
   <head><title>Spotify SDK Authorization Complete</title></head>
@@ -591,7 +588,7 @@ def authorize_local(
         callback_path,
         expected_state=resolved_state,
     )
-    return _resolve_awaitable(auth.exchange_code(code))
+    return resolve_awaitable(auth.exchange_code(code))
 
 
 def _wait_for_local_callback(
@@ -640,20 +637,6 @@ def _wait_for_local_callback(
         server.shutdown()
         server.server_close()
         thread.join(timeout=1.0)
-
-
-def _resolve_awaitable(value: _T | Awaitable[_T]) -> _T:
-    if inspect.isawaitable(value):
-        awaitable = cast(Awaitable[_T], value)
-        try:
-            return from_thread.run(_return_awaitable, awaitable)
-        except RuntimeError:
-            return asyncio.run(cast(Coroutine[Any, Any, _T], awaitable))
-    return value
-
-
-def _return_awaitable(value: Awaitable[_T]) -> Awaitable[_T]:
-    return value
 
 
 def _is_running_in_event_loop() -> bool:
