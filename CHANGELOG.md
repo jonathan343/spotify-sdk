@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.10.1
+
+### Bug fixes
+* Fixed authorization-code helper type checking with AnyIO 4.14 and later. ([#114](https://github.com/jonathan343/spotify-sdk/pull/114))
+
 ## v0.10.0
 
 ### Breaking Changes
